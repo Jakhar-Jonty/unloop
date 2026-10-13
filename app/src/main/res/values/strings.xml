@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Unloop</string>
+
+    <!-- Durations -->
+    <string name="duration_hm">%1$dh %2$dm</string>
+    <string name="duration_h">%dh</string>
+    <string name="duration_m">%dm</string>
+
+    <!-- Home -->
+    <string name="set_default_home">Set Unloop as home app  →</string>
+    <string name="screen_time_today">Screen time today</string>
+    <string name="see_where_time_goes">See where your time goes.</string>
+    <string name="allow_usage_access">Allow usage access</string>
+    <plurals name="unlocks">
+        <item quantity="one">%d unlock</item>
+        <item quantity="other">%d unlocks</item>
+    </plurals>
+    <string name="of_limit">of your %s limit</string>
+    <string name="over_limit">over your %s limit</string>
+    <string name="top_apps">Top apps</string>
+    <string name="nothing_over_minute">Nothing over a minute yet.</string>
+    <string name="see_your_week">See your week  →</string>
+    <string name="week_ready">Your week in review is ready  →</string>
+    <string name="home_empty">Long-press any app in All apps to put it here.</string>
+    <string name="focus_empty">No apps allowed in Focus mode. Add some in Settings.</string>
+    <string name="all_apps">All apps</string>
+    <string name="focus_mode">Focus mode</string>
+    <string name="end_focus">End focus</string>
+    <string name="focus_on">On</string>
+    <string name="focus_until_you_end">until you end it</string>
+    <string name="focus_left">%s left</string>
+    <string name="focus_ends_at">ends at %s</string>
+    <string name="notifications_silenced">Notifications silenced</string>
+    <string name="next_event">Next</string>
+    <string name="event_untitled">Event</string>
+
+    <!-- Streak plant -->
+    <plurals name="streak_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="streak_over_today">Over today</string>
+    <string name="plant_title">Your plant</string>
+    <string name="plant_body">Every day you stay under your %s limit, it grows a little. Go over and it starts again from a seed.</string>
+    <plurals name="plant_streak">
+        <item quantity="one">%d day in a row so far.</item>
+        <item quantity="other">%d days in a row so far.</item>
+    </plurals>
+    <string name="plant_over_today">You\'re over your limit today, so it starts again tomorrow.</string>
+    <string name="plant_ok">Got it</string>
+
+    <!-- All apps -->
+    <plurals name="installed">
+        <item quantity="one">%d installed</item>
+        <item quantity="other">%d installed</item>
+    </plurals>
+    <string name="search">Search</string>
+    <string name="search_hint">Type an app name</string>
+    <string name="no_match">No apps match “%s”.</string>
+    <string name="unloop_settings">Unloop settings  →</string>
+    <string name="show_hidden">Show hidden apps (%d)</string>
+    <string name="collapse_hidden">Collapse hidden apps</string>
+    <string name="pause_badge">5s pause</string>
+
+    <!-- Pause screen -->
+    <string name="about_to_open">You\'re about to open</string>
+    <string name="take_breath">Take one slow breath.</string>
+    <string name="why_open">Why are you opening %s?</string>
+    <string name="reason_reply">Reply to someone</string>
+    <string name="reason_look_up">Look something up</string>
+    <string name="reason_bored">Just bored</string>
+    <string name="reason_habit">Habit, honestly</string>
+    <string name="try_instead">Try this instead</string>
+    <string-array name="suggestions">
+        <item>Take a five-minute walk.</item>
+        <item>Drink a glass of water.</item>
+        <item>Read two pages of a book.</item>
+        <item>Stretch for one minute.</item>
+        <item>Text a friend instead of scrolling.</item>
+        <item>Look out of a window for a bit.</item>
+    </string-array>
+    <string name="opened_today">Opened today</string>
+    <string name="time_spent">Time spent</string>
+    <plurals name="times">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d times</item>
+    </plurals>
+    <string name="go_back_home">Go back home</string>
+    <string name="open_anyway_in">Open anyway in %ds</string>
+    <string name="pick_reason">Pick a reason to continue</string>
+    <string name="open_anyway">Open anyway</string>
+
+    <!-- App actions -->
+    <string name="add_to_home">Add to home</string>
+    <string name="remove_from_home">Remove from home</string>
+    <string name="pause_5s">5-second pause</string>
+    <string name="state_on">On</string>
+    <string name="state_off">Off</string>
+    <string name="allowed_in_focus">Allowed in Focus mode</string>
+    <string name="state_yes">Yes</string>
+    <string name="state_no">No</string>
+    <string name="show_in_list">Show in app list</string>
+    <string name="hide_from_list">Hide from app list</string>
+    <string name="app_info">App info</string>
+    <string name="uninstall">Uninstall</string>
+
+    <!-- Focus sheets -->
+    <string name="focus_sheet_body">Your home screen shrinks to the essentials. Everything else waits.</string>
+    <string name="how_long">How long</string>
+    <string name="minutes_short">%d min</string>
+    <string name="until_i_stop">Until I stop</string>
+    <string name="still_available">Still available</string>
+    <string name="no_focus_apps">No apps. Add some in Settings.</string>
+    <string name="change_focus_apps">Change these in Settings or by long-pressing an app.</string>
+    <string name="notifications">Notifications</string>
+    <string name="silence_them">Silence them</string>
+    <string name="let_through">Let them through</string>
+    <string name="dnd_needed">Silencing needs Do Not Disturb access. Tap “Silence them” to allow it.</string>
+    <string name="start_focus">Start focus</string>
+    <string name="end_focus_title">End focus early?</string>
+    <string name="end_focus_left">%s left. You\'re doing well.</string>
+    <string name="end_focus_no_end">You started this with no end time.</string>
+    <string name="keep_focusing">Keep focusing</string>
+    <string name="end_now">End now</string>
+
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="daily_limit">Daily screen-time limit</string>
+    <string name="focus_apps_hint">Focus mode and all schedules show only these apps on home.</string>
+    <string name="paused_hint">Tap to remove the pause.</string>
+    <string name="hidden_apps">Hidden apps</string>
+    <string name="hidden_hint">Hidden from All apps. Still installed.</string>
+    <string name="none">None</string>
+    <string name="permissions">Permissions</string>
+    <string name="usage_access">Usage access</string>
+    <string name="default_home">Default home app</string>
+    <string name="turn_on">Turn on  →</string>
+    <string name="version">Unloop %s</string>
+    <string name="strict_mode">Strict mode</string>
+    <string name="strict_body">Lock your settings. Until the time is up you can make them stricter, but not looser, and Focus mode can\'t be ended early.</string>
+    <string name="strict_on_until">On until %s</string>
+    <string name="strict_lock">Lock</string>
+    <string name="strict_confirm_title">Lock settings for %s?</string>
+    <string name="strict_confirm_body">Until %s you won\'t be able to remove pauses, unhide apps, raise your limit or end Focus mode early. This can\'t be undone.</string>
+    <string name="strict_confirm">Lock settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="home_widgets">On your home screen</string>
+    <string name="daily_quote">Quote on home</string>
+    <string name="next_event_setting">Next calendar event</string>
+    <string name="language">Language</string>
+    <string name="language_system">Phone default</string>
+
+    <!-- Weekly reflection -->
+    <string name="last_7_days">Last 7 days</string>
+    <string name="your_week">Your week</string>
+    <string name="daily_average">Daily average</string>
+    <string name="less_than_last_week">↓ %d%% less than last week</string>
+    <string name="more_than_last_week">↑ %d%% more than last week</string>
+    <string name="same_as_last_week">Same as last week</string>
+    <string name="no_last_week">No data for last week to compare yet.</string>
+    <string name="no_data">No data</string>
+    <string name="tap_day_hint">Tap a day for its total. Orange bars went over your %s limit.</string>
+    <string name="limit_label">%s limit</string>
+    <string name="under_limit">Under limit</string>
+    <plurals name="days_of">
+        <item quantity="one">%1$d of %2$d day</item>
+        <item quantity="other">%1$d of %2$d days</item>
+    </plurals>
+    <string name="unlocks_a_day">Unlocks a day</string>
+    <string name="turned_back">Turned back</string>
+    <string name="opened_anyway_stat">Opened anyway</string>
+    <string name="where_time_went">Where the time went</string>
+    <string name="closing_turned_back">You turned back more often than you went in. That\'s the habit changing.</string>
+    <string name="closing_under_limit">Most days stayed under your limit. Keep going.</string>
+    <string name="closing_heavy">A heavy week. One small change: put one more app behind the pause.</string>
+    <string name="week_needs_access">Allow usage access to see your week.</string>
+    <string name="week_loading">Adding up your week…</string>
+    <string name="week_no_data">No screen-time data yet. Check back in a day or two.</string>
+    <string name="share_week">Share my week</string>
+    <string name="share_week_text">My week on Unloop: %1$s a day on my phone (%2$s). %3$s under my limit, and I turned back from distracting apps %4$d times.</string>
+    <string name="share_week_vs">vs %s last week</string>
+    <string name="share_week_first">first week</string>
+
+    <!-- Toasts -->
+    <string name="strict_blocked">Strict mode is on until %s.</string>
+    <string name="home_full">Home holds %d apps. Remove one first.</string>
+    <string name="settings_open_failed">Couldn\'t open settings on this phone.</string>
+
+    <!-- Quotes: a random one is shown after every unlock -->
+    <string-array name="quotes">
+        <item>The phone can wait. This moment can\'t.</item>
+        <item>Attention is the rarest form of generosity.</item>
+        <item>Be where you are.</item>
+        <item>Less scrolling, more living.</item>
+        <item>What you feed your mind grows.</item>
+        <item>Boredom is where ideas begin.</item>
+        <item>Do one thing at a time.</item>
+        <item>Your time is your life.</item>
+        <item>Look up. The world is still there.</item>
+        <item>Small breaks, big focus.</item>
+            <item>Notifications can wait. Today won\'t come back.</item>
+        <item>Rest your eyes. Rest your mind.</item>
+        <item>Not every pause needs filling.</item>
+        <item>Call someone instead of scrolling past them.</item>
+        <item>Your attention is worth protecting.</item>
+        <item>Slow is also a speed.</item>
+        <item>Finish one thing before starting the next.</item>
+        <item>The best moments rarely happen on a screen.</item>
+        <item>Breathe in. Breathe out. Then decide.</item>
+        <item>A walk clears what scrolling clutters.</item>
+        <item>Be bored for a minute. See what comes.</item>
+        <item>Choose what gets your time.</item>
+        <item>Less input, more thought.</item>
+        <item>Put the phone down. Live the day.</item>
+        <item>You don\'t have to check.</item>
+        <item>Quiet is not empty.</item>
+        <item>Today, notice one small thing.</item>
+        <item>Deep work needs a quiet phone.</item>
+        <item>Make room for doing nothing.</item>
+        <item>The feed never ends. Your evening does.</item>
+        <item>Read a page before you scroll a page.</item>
+        <item>Every “just one minute” adds up.</item>
+        <item>Look at faces, not feeds.</item>
+        <item>Sleep is the best update.</item>
+        <item>Start the morning with yourself, not your phone.</item>
+        <item>Small habits, big changes.</item>
+        <item>Be with the people in the room.</item>
+        <item>Scrolling is easy. Living takes attention.</item>
+        <item>Your thoughts deserve some silence.</item>
+        <item>Close the app. Open the window.</item>
+    </string-array>
+    <!-- Pause everywhere / limits / schedules / gestures -->
+    <string name="accessibility_label">Unloop: pause everywhere</string>
+    <string name="accessibility_description">Lets Unloop show its pause and daily-limit screens when an app is opened from a notification, Recents or a link, and lock the screen when you double-tap home. Unloop only sees which app is open, never what is on the screen.</string>
+    <string name="limit_reached_label">Daily limit reached</string>
+    <string name="limit_reached_title">That\'s enough for today.</string>
+    <string name="limit_reached_body">You\'ve used %1$s for %2$s today. Your limit is %3$s.</string>
+    <string name="five_more_minutes">5 more minutes</string>
+    <string name="five_more_minutes_in">5 more minutes in %ds</string>
+    <string name="daily_limit_app">Daily limit</string>
+    <string name="daily_limit_for">Daily limit for %s</string>
+    <string name="daily_limit_sheet_body">When the time is used up, a block screen appears for the rest of the day.</string>
+    <string name="app_limits">Daily app limits</string>
+    <string name="app_limits_hint">After this much time in a day, the app is blocked.</string>
+    <string name="pause_everywhere">Pause everywhere</string>
+    <string name="pause_everywhere_hint">Also pause apps opened from notifications, Recents or links. Turn on “Unloop: pause everywhere” in Accessibility.</string>
+    <string name="pause_growth">Pause gets longer</string>
+    <string name="pause_growth_hint">Each open of the same app today adds time to its pause.</string>
+    <string name="growth_step">+%ds</string>
+    <string name="schedules">Schedules</string>
+    <string name="schedules_hint">Focus mode turns on by itself at these times. Sleep always silences notifications.</string>
+    <string name="schedule_work">Work</string>
+    <string name="schedule_wind_down">Wind down</string>
+    <string name="schedule_sleep">Sleep</string>
+    <string name="schedule_from">From</string>
+    <string name="schedule_to">To</string>
+    <string name="schedule_days">Days</string>
+    <string name="every_day">Every day</string>
+    <string name="save">Save</string>
+    <string-array name="weekday_short">
+        <item>M</item>
+        <item>T</item>
+        <item>W</item>
+        <item>T</item>
+        <item>F</item>
+        <item>S</item>
+        <item>S</item>
+    </string-array>
+    <string name="gestures">Gestures</string>
+    <string name="gestures_hint">Swipe up: all apps · Swipe down: notifications · Swipe right: camera · Double-tap: lock screen</string>
+    <string name="lock_needs_accessibility">Turn on Pause everywhere in Settings to lock with a double-tap.</string>
+    <!-- Settings overview -->
+    <string name="cat_screen_time">Screen time</string>
+    <string name="cat_pause">Pause</string>
+    <string name="cat_focus">Focus &amp; schedules</string>
+    <string name="cat_home">Home screen</string>
+    <string name="sum_per_day">%s a day</string>
+    <plurals name="sum_app_limits">
+        <item quantity="one">%d app limit</item>
+        <item quantity="other">%d app limits</item>
+    </plurals>
+    <string name="sum_no_app_limits">No app limits</string>
+    <plurals name="sum_paused">
+        <item quantity="one">%d app paused</item>
+        <item quantity="other">%d apps paused</item>
+    </plurals>
+    <string name="sum_everywhere">everywhere</string>
+    <string name="sum_from_unloop">from Unloop only</string>
+    <plurals name="sum_focus_apps">
+        <item quantity="one">%d app allowed</item>
+        <item quantity="other">%d apps allowed</item>
+    </plurals>
+    <string name="sum_no_schedules">no schedules</string>
+    <string name="sum_quote">Quote</string>
+    <string name="sum_gestures">Gestures</string>
+    <string name="sum_off">Off</string>
+    <string name="perm_all_set">All set</string>
+    <plurals name="perm_attention">
+        <item quantity="one">%d needs attention</item>
+        <item quantity="other">%d need attention</item>
+    </plurals>
+    <string name="today_limit_status">Daily limit %s</string>
+    <string name="strict_short_on">Strict mode on</string>
+    <string name="dnd_access">Do Not Disturb access</string>
+    <string name="calendar_access">Calendar</string>
+    <string name="paused_apps">Paused apps</string>
+    <string name="paused_apps_hint">These apps get the breathing pause before they open.</string>
+    <string name="optional">Optional</string>
+    <string name="add_app">+  Add app</string>
+    <string name="done">Done</string>
+</resources>

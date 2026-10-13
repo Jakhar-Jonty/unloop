@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Durations -->
+    <string name="duration_hm">%1$d घं %2$d मि</string>
+    <string name="duration_h">%d घं</string>
+    <string name="duration_m">%d मि</string>
+
+    <!-- Home -->
+    <string name="set_default_home">Unloop को होम ऐप बनाएं  →</string>
+    <string name="screen_time_today">आज का स्क्रीन टाइम</string>
+    <string name="see_where_time_goes">देखें आपका समय कहाँ जाता है।</string>
+    <string name="allow_usage_access">यूसेज एक्सेस दें</string>
+    <plurals name="unlocks">
+        <item quantity="one">%d बार अनलॉक</item>
+        <item quantity="other">%d बार अनलॉक</item>
+    </plurals>
+    <string name="of_limit">आपकी %s की सीमा में से</string>
+    <string name="over_limit">आपकी %s की सीमा से ज़्यादा</string>
+    <string name="top_apps">सबसे ज़्यादा इस्तेमाल</string>
+    <string name="nothing_over_minute">अभी तक कुछ भी एक मिनट से ज़्यादा नहीं।</string>
+    <string name="see_your_week">अपना हफ़्ता देखें  →</string>
+    <string name="week_ready">आपके हफ़्ते का हिसाब तैयार है  →</string>
+    <string name="home_empty">किसी ऐप को यहाँ लाने के लिए सभी ऐप्स में उसे दबाकर रखें।</string>
+    <string name="focus_empty">फ़ोकस मोड में कोई ऐप नहीं है। सेटिंग्स में जोड़ें।</string>
+    <string name="all_apps">सभी ऐप्स</string>
+    <string name="focus_mode">फ़ोकस मोड</string>
+    <string name="end_focus">फ़ोकस खत्म करें</string>
+    <string name="focus_on">चालू</string>
+    <string name="focus_until_you_end">जब तक आप बंद न करें</string>
+    <string name="focus_left">%s बाकी</string>
+    <string name="focus_ends_at">%s पर खत्म</string>
+    <string name="notifications_silenced">नोटिफ़िकेशन बंद हैं</string>
+    <string name="next_event">आगे</string>
+    <string name="event_untitled">इवेंट</string>
+
+    <!-- Streak plant -->
+    <plurals name="streak_days">
+        <item quantity="one">%d दिन</item>
+        <item quantity="other">%d दिन</item>
+    </plurals>
+    <string name="streak_over_today">आज सीमा पार</string>
+    <string name="plant_title">आपका पौधा</string>
+    <string name="plant_body">जिस दिन आप %s की सीमा में रहते हैं, यह थोड़ा बढ़ता है। सीमा पार की तो यह फिर से बीज से शुरू होगा।</string>
+    <plurals name="plant_streak">
+        <item quantity="one">अब तक लगातार %d दिन।</item>
+        <item quantity="other">अब तक लगातार %d दिन।</item>
+    </plurals>
+    <string name="plant_over_today">आज आप सीमा पार कर चुके हैं, इसलिए कल से फिर शुरू होगा।</string>
+    <string name="plant_ok">ठीक है</string>
+
+    <!-- All apps -->
+    <plurals name="installed">
+        <item quantity="one">%d इंस्टॉल</item>
+        <item quantity="other">%d इंस्टॉल</item>
+    </plurals>
+    <string name="search">खोजें</string>
+    <string name="search_hint">ऐप का नाम लिखें</string>
+    <string name="no_match">“%s” से कोई ऐप नहीं मिला।</string>
+    <string name="unloop_settings">Unloop सेटिंग्स  →</string>
+    <string name="show_hidden">छिपे हुए ऐप्स दिखाएं (%d)</string>
+    <string name="collapse_hidden">छिपे हुए ऐप्स बंद करें</string>
+    <string name="pause_badge">5 से. रुकें</string>
+
+    <!-- Pause screen -->
+    <string name="about_to_open">आप खोलने जा रहे हैं</string>
+    <string name="take_breath">एक धीमी, गहरी साँस लें।</string>
+    <string name="why_open">आप %s क्यों खोल रहे हैं?</string>
+    <string name="reason_reply">किसी को जवाब देना है</string>
+    <string name="reason_look_up">कुछ देखना है</string>
+    <string name="reason_bored">बस बोर हो रहा हूँ</string>
+    <string name="reason_habit">सच कहूँ तो आदत</string>
+    <string name="try_instead">इसकी जगह यह करें</string>
+    <string-array name="suggestions">
+        <item>पाँच मिनट टहल आइए।</item>
+        <item>एक गिलास पानी पीजिए।</item>
+        <item>किसी किताब के दो पन्ने पढ़िए।</item>
+        <item>एक मिनट स्ट्रेच कीजिए।</item>
+        <item>स्क्रॉल करने की जगह किसी दोस्त को मैसेज कीजिए।</item>
+        <item>थोड़ी देर खिड़की से बाहर देखिए।</item>
+    </string-array>
+    <string name="opened_today">आज खोला</string>
+    <string name="time_spent">बिताया समय</string>
+    <plurals name="times">
+        <item quantity="one">%d बार</item>
+        <item quantity="other">%d बार</item>
+    </plurals>
+    <string name="go_back_home">वापस होम पर जाएं</string>
+    <string name="open_anyway_in">%d से. में फिर भी खोलें</string>
+    <string name="pick_reason">आगे बढ़ने के लिए वजह चुनें</string>
+    <string name="open_anyway">फिर भी खोलें</string>
+
+    <!-- App actions -->
+    <string name="add_to_home">होम पर जोड़ें</string>
+    <string name="remove_from_home">होम से हटाएं</string>
+    <string name="pause_5s">5 सेकंड का ठहराव</string>
+    <string name="state_on">चालू</string>
+    <string name="state_off">बंद</string>
+    <string name="allowed_in_focus">फ़ोकस मोड में चलेगा</string>
+    <string name="state_yes">हाँ</string>
+    <string name="state_no">नहीं</string>
+    <string name="show_in_list">ऐप सूची में दिखाएं</string>
+    <string name="hide_from_list">ऐप सूची से छिपाएं</string>
+    <string name="app_info">ऐप की जानकारी</string>
+    <string name="uninstall">अनइंस्टॉल करें</string>
+
+    <!-- Focus sheets -->
+    <string name="focus_sheet_body">होम स्क्रीन पर सिर्फ़ ज़रूरी ऐप्स रहेंगे। बाकी सब इंतज़ार करेंगे।</string>
+    <string name="how_long">कितनी देर</string>
+    <string name="minutes_short">%d मिनट</string>
+    <string name="until_i_stop">जब तक मैं न रोकूँ</string>
+    <string name="still_available">ये ऐप्स चलेंगे</string>
+    <string name="no_focus_apps">कोई ऐप नहीं। सेटिंग्स में जोड़ें।</string>
+    <string name="change_focus_apps">इन्हें सेटिंग्स में या किसी ऐप को दबाकर रखकर बदलें।</string>
+    <string name="notifications">नोटिफ़िकेशन</string>
+    <string name="silence_them">बंद रखें</string>
+    <string name="let_through">आने दें</string>
+    <string name="dnd_needed">बंद रखने के लिए Do Not Disturb की अनुमति चाहिए। अनुमति देने के लिए “बंद रखें” दबाएं।</string>
+    <string name="start_focus">फ़ोकस शुरू करें</string>
+    <string name="end_focus_title">फ़ोकस पहले ही खत्म करें?</string>
+    <string name="end_focus_left">%s बाकी है। आप अच्छा कर रहे हैं।</string>
+    <string name="end_focus_no_end">आपने इसे बिना समय सीमा के शुरू किया था।</string>
+    <string name="keep_focusing">फ़ोकस जारी रखें</string>
+    <string name="end_now">अभी खत्म करें</string>
+
+    <!-- Settings -->
+    <string name="settings">सेटिंग्स</string>
+    <string name="daily_limit">रोज़ की स्क्रीन टाइम सीमा</string>
+    <string name="focus_apps_hint">फ़ोकस मोड और सभी समय-सारणी में होम पर सिर्फ़ ये ऐप्स दिखेंगे।</string>
+    <string name="paused_hint">ठहराव हटाने के लिए दबाएं।</string>
+    <string name="hidden_apps">छिपे हुए ऐप्स</string>
+    <string name="hidden_hint">सभी ऐप्स में नहीं दिखेंगे। इंस्टॉल रहेंगे।</string>
+    <string name="none">कोई नहीं</string>
+    <string name="permissions">अनुमतियाँ</string>
+    <string name="usage_access">यूसेज एक्सेस</string>
+    <string name="default_home">डिफ़ॉल्ट होम ऐप</string>
+    <string name="turn_on">चालू करें  →</string>
+    <string name="version">Unloop %s</string>
+    <string name="strict_mode">सख़्त मोड</string>
+    <string name="strict_body">अपनी सेटिंग्स लॉक करें। समय पूरा होने तक आप उन्हें और सख़्त कर सकते हैं, ढीला नहीं, और फ़ोकस मोड बीच में खत्म नहीं होगा।</string>
+    <string name="strict_on_until">%s तक चालू</string>
+    <string name="strict_lock">लॉक करें</string>
+    <string name="strict_confirm_title">%s के लिए सेटिंग्स लॉक करें?</string>
+    <string name="strict_confirm_body">%s तक आप ठहराव नहीं हटा पाएंगे, ऐप्स नहीं दिखा पाएंगे, सीमा नहीं बढ़ा पाएंगे और फ़ोकस मोड बीच में खत्म नहीं कर पाएंगे। इसे वापस नहीं लिया जा सकता।</string>
+    <string name="strict_confirm">सेटिंग्स लॉक करें</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="home_widgets">आपकी होम स्क्रीन पर</string>
+    <string name="daily_quote">होम पर विचार</string>
+    <string name="next_event_setting">कैलेंडर का अगला इवेंट</string>
+    <string name="language">भाषा</string>
+    <string name="language_system">फ़ोन की भाषा</string>
+
+    <!-- Weekly reflection -->
+    <string name="last_7_days">पिछले 7 दिन</string>
+    <string name="your_week">आपका हफ़्ता</string>
+    <string name="daily_average">रोज़ का औसत</string>
+    <string name="less_than_last_week">↓ पिछले हफ़्ते से %d%% कम</string>
+    <string name="more_than_last_week">↑ पिछले हफ़्ते से %d%% ज़्यादा</string>
+    <string name="same_as_last_week">पिछले हफ़्ते जितना</string>
+    <string name="no_last_week">तुलना के लिए पिछले हफ़्ते का डेटा अभी नहीं है।</string>
+    <string name="no_data">डेटा नहीं</string>
+    <string name="tap_day_hint">किसी दिन का कुल समय देखने के लिए उसे दबाएं। नारंगी बार %s की सीमा से ज़्यादा हैं।</string>
+    <string name="limit_label">%s सीमा</string>
+    <string name="under_limit">सीमा के अंदर</string>
+    <plurals name="days_of">
+        <item quantity="one">%2$d में से %1$d दिन</item>
+        <item quantity="other">%2$d में से %1$d दिन</item>
+    </plurals>
+    <string name="unlocks_a_day">रोज़ के अनलॉक</string>
+    <string name="turned_back">वापस मुड़े</string>
+    <string name="opened_anyway_stat">फिर भी खोला</string>
+    <string name="where_time_went">समय कहाँ गया</string>
+    <string name="closing_turned_back">आप जितनी बार अंदर गए, उससे ज़्यादा बार वापस मुड़े। आदत बदल रही है।</string>
+    <string name="closing_under_limit">ज़्यादातर दिन आप सीमा के अंदर रहे। ऐसे ही चलते रहिए।</string>
+    <string name="closing_heavy">भारी हफ़्ता रहा। एक छोटा बदलाव: एक और ऐप पर ठहराव लगाइए।</string>
+    <string name="week_needs_access">अपना हफ़्ता देखने के लिए यूसेज एक्सेस दें।</string>
+    <string name="week_loading">आपके हफ़्ते का हिसाब लगा रहे हैं…</string>
+    <string name="week_no_data">अभी स्क्रीन टाइम डेटा नहीं है। एक-दो दिन बाद देखें।</string>
+    <string name="share_week">अपना हफ़्ता शेयर करें</string>
+    <string name="share_week_text">Unloop पर मेरा हफ़्ता: फ़ोन पर रोज़ %1$s (%2$s)। %3$s सीमा के अंदर, और %4$d बार ध्यान भटकाने वाले ऐप्स से वापस मुड़ा।</string>
+    <string name="share_week_vs">पिछले हफ़्ते %s</string>
+    <string name="share_week_first">पहला हफ़्ता</string>
+
+    <!-- Toasts -->
+    <string name="strict_blocked">सख़्त मोड %s तक चालू है।</string>
+    <string name="home_full">होम पर %d ऐप्स ही आ सकते हैं। पहले एक हटाएं।</string>
+    <string name="settings_open_failed">इस फ़ोन पर सेटिंग्स नहीं खुल सकीं।</string>
+
+    <!-- Quotes: a random one is shown after every unlock -->
+    <string-array name="quotes">
+        <item>फ़ोन इंतज़ार कर सकता है। यह पल नहीं।</item>
+        <item>ध्यान देना सबसे बड़ी उदारता है।</item>
+        <item>जहाँ हैं, वहीं रहिए।</item>
+        <item>कम स्क्रॉल, ज़्यादा ज़िंदगी।</item>
+        <item>मन को जो खिलाते हैं, वही बढ़ता है।</item>
+        <item>बोरियत से ही नए विचार शुरू होते हैं।</item>
+        <item>एक समय में एक काम।</item>
+        <item>आपका समय ही आपकी ज़िंदगी है।</item>
+        <item>ऊपर देखिए। दुनिया अभी भी वहीं है।</item>
+        <item>छोटे ब्रेक, गहरा ध्यान।</item>
+            <item>नोटिफ़िकेशन रुक सकते हैं। आज वापस नहीं आएगा।</item>
+        <item>आँखों को आराम दें। मन को आराम दें।</item>
+        <item>हर ठहराव को भरना ज़रूरी नहीं।</item>
+        <item>किसी की पोस्ट स्क्रॉल करने की जगह उसे फ़ोन कीजिए।</item>
+        <item>आपका ध्यान बचाने लायक है।</item>
+        <item>धीमे चलना भी चलना है।</item>
+        <item>अगला काम शुरू करने से पहले एक पूरा कीजिए।</item>
+        <item>सबसे अच्छे पल शायद ही कभी स्क्रीन पर होते हैं।</item>
+        <item>साँस लीजिए। साँस छोड़िए। फिर तय कीजिए।</item>
+        <item>जो स्क्रॉलिंग उलझाती है, एक सैर उसे सुलझा देती है।</item>
+        <item>एक मिनट बोर होकर देखिए, क्या सूझता है।</item>
+        <item>तय कीजिए कि आपका समय किसे मिले।</item>
+        <item>कम जानकारी, ज़्यादा सोच।</item>
+        <item>फ़ोन रखिए। दिन को जीइए।</item>
+        <item>हर बार देखना ज़रूरी नहीं।</item>
+        <item>शांति खालीपन नहीं है।</item>
+        <item>आज कोई एक छोटी चीज़ गौर से देखिए।</item>
+        <item>गहरे काम के लिए फ़ोन का शांत रहना ज़रूरी है।</item>
+        <item>कुछ न करने के लिए भी जगह रखिए।</item>
+        <item>फ़ीड कभी खत्म नहीं होती। आपकी शाम हो जाती है।</item>
+        <item>एक पेज स्क्रॉल करने से पहले एक पन्ना पढ़िए।</item>
+        <item>हर “बस एक मिनट” जुड़ता जाता है।</item>
+        <item>फ़ीड नहीं, चेहरे देखिए।</item>
+        <item>नींद सबसे अच्छा अपडेट है।</item>
+        <item>सुबह की शुरुआत खुद से कीजिए, फ़ोन से नहीं।</item>
+        <item>छोटी आदतें, बड़े बदलाव।</item>
+        <item>जो पास बैठे हैं, उनके साथ रहिए।</item>
+        <item>स्क्रॉल करना आसान है। जीने में ध्यान लगता है।</item>
+        <item>आपके विचारों को भी थोड़ी शांति चाहिए।</item>
+        <item>ऐप बंद कीजिए। खिड़की खोलिए।</item>
+    </string-array>
+    <!-- Pause everywhere / limits / schedules / gestures -->
+    <string name="accessibility_label">Unloop: हर जगह ठहराव</string>
+    <string name="accessibility_description">जब कोई ऐप नोटिफ़िकेशन, हाल के ऐप्स या किसी लिंक से खुले, तब भी Unloop अपना ठहराव और रोज़ की सीमा वाली स्क्रीन दिखा सके, और होम पर दो बार टैप करने पर स्क्रीन लॉक कर सके। Unloop सिर्फ़ यह देखता है कि कौन-सा ऐप खुला है, स्क्रीन पर क्या है यह कभी नहीं।</string>
+    <string name="limit_reached_label">आज की सीमा पूरी</string>
+    <string name="limit_reached_title">आज के लिए इतना काफ़ी है।</string>
+    <string name="limit_reached_body">आज आपने %1$s पर %2$s बिताए। आपकी सीमा %3$s है।</string>
+    <string name="five_more_minutes">5 मिनट और</string>
+    <string name="five_more_minutes_in">%d से. में 5 मिनट और</string>
+    <string name="daily_limit_app">रोज़ की सीमा</string>
+    <string name="daily_limit_for">%s की रोज़ की सीमा</string>
+    <string name="daily_limit_sheet_body">समय पूरा होने पर बाकी दिन के लिए रोकने वाली स्क्रीन दिखेगी।</string>
+    <string name="app_limits">ऐप्स की रोज़ की सीमा</string>
+    <string name="app_limits_hint">दिन में इतना समय होने के बाद ऐप रुक जाएगा।</string>
+    <string name="pause_everywhere">हर जगह ठहराव</string>
+    <string name="pause_everywhere_hint">नोटिफ़िकेशन, हाल के ऐप्स या लिंक से खुले ऐप्स पर भी ठहराव। Accessibility में “Unloop: हर जगह ठहराव” चालू करें।</string>
+    <string name="pause_growth">ठहराव बढ़ता जाए</string>
+    <string name="pause_growth_hint">आज उसी ऐप को हर बार खोलने पर ठहराव थोड़ा लंबा होगा।</string>
+    <string name="growth_step">+%d से.</string>
+    <string name="schedules">समय-सारणी</string>
+    <string name="schedules_hint">इन समयों पर फ़ोकस मोड अपने आप चालू होगा। नींद में नोटिफ़िकेशन हमेशा बंद रहते हैं।</string>
+    <string name="schedule_work">काम</string>
+    <string name="schedule_wind_down">आराम का समय</string>
+    <string name="schedule_sleep">नींद</string>
+    <string name="schedule_from">से</string>
+    <string name="schedule_to">तक</string>
+    <string name="schedule_days">दिन</string>
+    <string name="every_day">हर दिन</string>
+    <string name="save">सेव करें</string>
+    <string-array name="weekday_short">
+        <item>सो</item>
+        <item>मं</item>
+        <item>बु</item>
+        <item>गु</item>
+        <item>शु</item>
+        <item>श</item>
+        <item>र</item>
+    </string-array>
+    <string name="gestures">जेस्चर</string>
+    <string name="gestures_hint">ऊपर स्वाइप: सभी ऐप्स · नीचे स्वाइप: नोटिफ़िकेशन · दाएँ स्वाइप: कैमरा · दो बार टैप: स्क्रीन लॉक</string>
+    <string name="lock_needs_accessibility">दो बार टैप से लॉक करने के लिए सेटिंग्स में “हर जगह ठहराव” चालू करें।</string>
+    <!-- Settings overview -->
+    <string name="cat_screen_time">स्क्रीन टाइम</string>
+    <string name="cat_pause">ठहराव</string>
+    <string name="cat_focus">फ़ोकस और समय-सारणी</string>
+    <string name="cat_home">होम स्क्रीन</string>
+    <string name="sum_per_day">रोज़ %s</string>
+    <plurals name="sum_app_limits">
+        <item quantity="one">%d ऐप पर सीमा</item>
+        <item quantity="other">%d ऐप्स पर सीमा</item>
+    </plurals>
+    <string name="sum_no_app_limits">किसी ऐप पर सीमा नहीं</string>
+    <plurals name="sum_paused">
+        <item quantity="one">%d ऐप पर ठहराव</item>
+        <item quantity="other">%d ऐप्स पर ठहराव</item>
+    </plurals>
+    <string name="sum_everywhere">हर जगह</string>
+    <string name="sum_from_unloop">सिर्फ़ Unloop से</string>
+    <plurals name="sum_focus_apps">
+        <item quantity="one">%d ऐप चलेगा</item>
+        <item quantity="other">%d ऐप्स चलेंगे</item>
+    </plurals>
+    <string name="sum_no_schedules">कोई समय-सारणी नहीं</string>
+    <string name="sum_quote">विचार</string>
+    <string name="sum_gestures">जेस्चर</string>
+    <string name="sum_off">बंद</string>
+    <string name="perm_all_set">सब ठीक है</string>
+    <plurals name="perm_attention">
+        <item quantity="one">%d पर ध्यान दें</item>
+        <item quantity="other">%d पर ध्यान दें</item>
+    </plurals>
+    <string name="today_limit_status">रोज़ की सीमा %s</string>
+    <string name="strict_short_on">सख़्त मोड चालू</string>
+    <string name="dnd_access">Do Not Disturb की अनुमति</string>
+    <string name="calendar_access">कैलेंडर</string>
+    <string name="paused_apps">ठहराव वाले ऐप्स</string>
+    <string name="paused_apps_hint">इन ऐप्स के खुलने से पहले साँस वाला ठहराव आएगा।</string>
+    <string name="optional">ज़रूरी नहीं</string>
+    <string name="add_app">+  ऐप जोड़ें</string>
+    <string name="done">हो गया</string>
+</resources>

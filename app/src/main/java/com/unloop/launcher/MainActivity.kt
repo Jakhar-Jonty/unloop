@@ -1,0 +1,433 @@
+package com.unloop.launcher
+
+import kotlinx.coroutines.launch
+import com.unloop.launcher.ui.screens.LimitReached
+import com.unloop.launcher.ui.screens.LIMIT_WAIT_SECONDS
+import com.unloop.launcher.ui.screens.DailyLimitSheet
+import com.unloop.launcher.service.UnloopAccessibilityService
+import com.unloop.launcher.data.Gate
+import androidx.compose.runtime.rememberCoroutineScope
+import android.provider.MediaStore
+import android.annotation.SuppressLint
+import android.Manifest
+import android.app.LocaleManager
+import android.app.role.RoleManager
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.LocaleList
+import android.os.PowerManager
+import android.provider.Settings
+import android.text.format.DateFormat
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.unloop.launcher.data.AppInfo
+import com.unloop.launcher.data.FOCUS_UNTIL_STOPPED
+import com.unloop.launcher.data.MAX_FAVORITES
+import com.unloop.launcher.ui.components.Plant
+import com.unloop.launcher.ui.components.PopButton
+import com.unloop.launcher.ui.duration
+import com.unloop.launcher.ui.limit
+import com.unloop.launcher.ui.screens.AllAppsScreen
+import com.unloop.launcher.ui.screens.AppActionsSheet
+import com.unloop.launcher.ui.screens.EndFocusSheet
+import com.unloop.launcher.ui.screens.HomeScreen
+import com.unloop.launcher.ui.screens.PauseScreen
+import com.unloop.launcher.ui.screens.ReflectionScreen
+import com.unloop.launcher.ui.screens.SettingsScreen
+import com.unloop.launcher.ui.screens.StartFocusSheet
+import com.unloop.launcher.ui.screens.UnloopSheet
+import com.unloop.launcher.ui.theme.Display
+import com.unloop.launcher.ui.theme.UnloopColors
+import com.unloop.launcher.ui.theme.UnloopTheme
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+private enum class FocusSheet { Start, End }
+
+private sealed interface Screen {
+    data object Home : Screen
+    data object AllApps : Screen
+    data object Settings : Screen
+    data object Reflection : Screen
+    data class Pause(val app: AppInfo, val gate: Gate) : Screen
+}
+
+class MainActivity : ComponentActivity() {
+    private val vm: LauncherViewModel by viewModels()
+
+    /** Bumped on every Home button press so the UI can jump back to the home screen. */
+    private var homePresses by mutableIntStateOf(0)
+
+    private val roleRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        vm.refreshSystemState()
+        // The system stops showing the role dialog after repeated "no"; fall back to Settings.
+        if (!vm.state.value.isDefaultLauncher) openSettings(Intent(Settings.ACTION_HOME_SETTINGS))
+    }
+
+    private val calendarRequest = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        vm.setShowNextEvent(granted)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+        )
+        super.onCreate(savedInstanceState)
+        setContent {
+            UnloopTheme {
+                UnloopApp()
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Screen went off (or the phone was locked) with home showing: new quote when it comes back.
+        if (!getSystemService(PowerManager::class.java).isInteractive) vm.onLockedFromHome()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        homePresses++
+    }
+
+    override fun onResume() {
+        super.onResume()
+        vm.onResume()
+    }
+
+    @Composable
+    private fun UnloopApp() {
+        val state by vm.state.collectAsStateWithLifecycle()
+        var screen by remember { mutableStateOf<Screen>(Screen.Home) }
+        var sheetApp by remember { mutableStateOf<AppInfo?>(null) }
+        var focusSheet by remember { mutableStateOf<FocusSheet?>(null) }
+        var plantSheet by remember { mutableStateOf(false) }
+        var limitApp by remember { mutableStateOf<AppInfo?>(null) }
+        val scope = rememberCoroutineScope()
+
+        LaunchedEffect(homePresses) {
+            screen = Screen.Home
+            sheetApp = null
+            focusSheet = null
+            plantSheet = false
+            limitApp = null
+        }
+
+        LaunchedEffect(Unit) {
+            vm.notices.collect { notice ->
+                toast(
+                    when (notice) {
+                        is Notice.StrictBlocked -> getString(R.string.strict_blocked, formatDateTime(notice.until))
+                        Notice.HomeFull -> getString(R.string.home_full, MAX_FAVORITES)
+                    },
+                )
+            }
+        }
+
+        fun open(app: AppInfo) {
+            scope.launch {
+                when (val gate = vm.gateFor(app)) {
+                    Gate.Open -> {
+                        vm.launch(app)
+                        screen = Screen.Home
+                    }
+                    else -> screen = Screen.Pause(app, gate)
+                }
+            }
+        }
+
+        Crossfade(targetState = screen, animationSpec = tween(220), label = "screen") { current ->
+            when (current) {
+                Screen.Home -> HomeScreen(
+                    state = state,
+                    onOpenApp = ::open,
+                    onAppActions = { sheetApp = it },
+                    onAllApps = { screen = Screen.AllApps },
+                    onFocusMode = { focusSheet = FocusSheet.Start },
+                    onEndFocus = { focusSheet = FocusSheet.End },
+                    onSettings = { screen = Screen.Settings },
+                    onWeek = {
+                        vm.loadWeek()
+                        screen = Screen.Reflection
+                    },
+                    onPlant = { plantSheet = true },
+                    onNotifications = ::expandNotifications,
+                    onCamera = { openSettings(Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA)) },
+                    onLock = {
+                        if (UnloopAccessibilityService.instance?.lockScreen() != true) {
+                            toast(getString(R.string.lock_needs_accessibility))
+                        }
+                    },
+                    onGrantUsage = ::openUsageAccess,
+                    onSetDefault = ::requestDefaultLauncher,
+                    onMinuteTick = vm::refreshUsage,
+                )
+                Screen.AllApps -> AllAppsScreen(
+                    state = state,
+                    onOpenApp = ::open,
+                    onAppActions = { sheetApp = it },
+                    onBack = { screen = Screen.Home },
+                    onSettings = { screen = Screen.Settings },
+                )
+                Screen.Reflection -> ReflectionScreen(
+                    state = state,
+                    onBack = { screen = Screen.Home },
+                    onShare = ::shareText,
+                )
+                Screen.Settings -> SettingsScreen(
+                    state = state,
+                    language = appLanguage(),
+                    canPickLanguage = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
+                    onBack = { screen = Screen.Home },
+                    onSetLimit = vm::setDailyLimit,
+                    onToggleFocusApp = vm::toggleFocusApp,
+                    onTogglePaused = vm::togglePaused,
+                    onToggleHidden = vm::toggleHidden,
+                    onStartStrict = vm::startStrict,
+                    onShowQuote = vm::setShowQuote,
+                    onShowNextEvent = { on ->
+                        if (on && !state.hasCalendarAccess) {
+                            calendarRequest.launch(Manifest.permission.READ_CALENDAR)
+                        } else {
+                            vm.setShowNextEvent(on)
+                        }
+                    },
+                    onLanguage = ::setLanguage,
+                    onPauseEverywhere = { openSettings(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
+                    onPauseStep = vm::setPauseStep,
+                    onRemoveLimit = { vm.setAppLimit(it, null) },
+                    onUpdateSchedule = vm::updateSchedule,
+                    onGestures = vm::setGestures,
+                    onGrantDnd = { openSettings(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) },
+                    onSetAppLimit = vm::setAppLimit,
+                    onGrantUsage = ::openUsageAccess,
+                    onSetDefault = ::requestDefaultLauncher,
+                )
+                is Screen.Pause -> {
+                    val gate = current.gate
+                    PauseScreen(
+                        appLabel = current.app.label,
+                        appKey = current.app.key,
+                        usage = (gate as? Gate.Pause)?.usage ?: (gate as? Gate.Limit)?.usage,
+                        hasUsageAccess = state.hasUsageAccess,
+                        seconds = (gate as? Gate.Pause)?.seconds ?: LIMIT_WAIT_SECONDS,
+                        limit = (gate as? Gate.Limit)?.let { LimitReached(it.usedMs, it.limitMinutes, it.canExtend) },
+                        onGoHome = {
+                            if (gate is Gate.Pause) vm.recordPause(turnedBack = true)
+                            screen = Screen.Home
+                        },
+                        onOpenAnyway = {
+                            vm.openAfterGate(current.app, gate)
+                            screen = Screen.Home
+                        },
+                    )
+                }
+            }
+        }
+
+        sheetApp?.let { app ->
+            AppActionsSheet(
+                app = app,
+                isFavorite = state.favorites.any { it.packageName == app.packageName },
+                isPaused = app.packageName in state.paused,
+                isHidden = app.packageName in state.hidden,
+                isFocusApp = app.packageName in state.focusApps,
+                limitMinutes = state.appLimits[app.packageName],
+                onDismiss = { sheetApp = null },
+                onToggleFavorite = {
+                    vm.toggleFavorite(app.packageName)
+                    sheetApp = null
+                },
+                onTogglePaused = { vm.togglePaused(app.packageName) },
+                onToggleHidden = {
+                    vm.toggleHidden(app.packageName)
+                    sheetApp = null
+                },
+                onToggleFocusApp = { vm.toggleFocusApp(app.packageName) },
+                onDailyLimit = {
+                    limitApp = app
+                    sheetApp = null
+                },
+                onAppInfo = {
+                    vm.openAppInfo(app)
+                    sheetApp = null
+                },
+                onUninstall = {
+                    openSettings(Intent(Intent.ACTION_DELETE, Uri.fromParts("package", app.packageName, null)))
+                    sheetApp = null
+                },
+            )
+        }
+
+        when (focusSheet) {
+            FocusSheet.Start -> StartFocusSheet(
+                allowedLabels = state.apps.filter { it.packageName in state.focusApps }.map { it.label },
+                silence = state.focusSilence,
+                hasDndAccess = state.hasDndAccess,
+                onSilenceChange = vm::setFocusSilence,
+                onGrantDnd = {
+                    vm.setFocusSilence(true)
+                    openSettings(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+                },
+                onDismiss = { focusSheet = null },
+                onStart = { minutes ->
+                    vm.startFocus(minutes)
+                    focusSheet = null
+                },
+            )
+            FocusSheet.End -> EndFocusSheet(
+                remainingText = if (state.focusUntil == FOCUS_UNTIL_STOPPED) {
+                    stringResource(R.string.end_focus_no_end)
+                } else {
+                    stringResource(R.string.end_focus_left, duration(state.focusUntil - System.currentTimeMillis() + 59_999))
+                },
+                strictUntilText = if (state.isStrict()) formatDateTime(state.strictUntil) else null,
+                onDismiss = { focusSheet = null },
+                onEnd = {
+                    vm.endFocus()
+                    focusSheet = null
+                },
+            )
+            null -> Unit
+        }
+
+        limitApp?.let { app ->
+            DailyLimitSheet(
+                appLabel = app.label,
+                current = state.appLimits[app.packageName],
+                onDismiss = { limitApp = null },
+                onChoose = { minutes ->
+                    vm.setAppLimit(app.packageName, minutes)
+                    limitApp = null
+                },
+            )
+        }
+
+        if (plantSheet) {
+            val streak = state.streak ?: 0
+            UnloopSheet(onDismiss = { plantSheet = false }) {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Plant(streak = streak, wilting = state.overToday, modifier = Modifier.size(width = 105.dp, height = 120.dp))
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(stringResource(R.string.plant_title), fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 30.sp)
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    stringResource(R.string.plant_body, limit(state.limitMinutes)),
+                    color = UnloopColors.TextSoft,
+                    fontFamily = Display,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    lineHeight = 22.sp,
+                )
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    if (state.overToday) stringResource(R.string.plant_over_today)
+                    else pluralStringResource(R.plurals.plant_streak, streak, streak),
+                    color = if (state.overToday) UnloopColors.Orange else UnloopColors.Lime,
+                    fontFamily = Display,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                )
+                Spacer(Modifier.height(24.dp))
+                PopButton(stringResource(R.string.plant_ok), onClick = { plantSheet = false }, modifier = Modifier.fillMaxWidth())
+            }
+        }
+    }
+
+    private fun requestDefaultLauncher() {
+        if (vm.state.value.isDefaultLauncher) return
+        val roles = getSystemService(RoleManager::class.java)
+        if (roles.isRoleAvailable(RoleManager.ROLE_HOME)) {
+            roleRequest.launch(roles.createRequestRoleIntent(RoleManager.ROLE_HOME))
+        } else {
+            openSettings(Intent(Settings.ACTION_HOME_SETTINGS))
+        }
+    }
+
+    private fun openUsageAccess() {
+        try {
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS, Uri.fromParts("package", packageName, null)))
+        } catch (_: ActivityNotFoundException) {
+            openSettings(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+        }
+    }
+
+    /** Per-app language (Android 13+). Null follows the phone. */
+    private fun appLanguage(): String? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return null
+        val locales = getSystemService(LocaleManager::class.java).applicationLocales
+        return if (locales.isEmpty) null else locales[0].language
+    }
+
+    private fun setLanguage(tag: String?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSystemService(LocaleManager::class.java).applicationLocales =
+                if (tag == null) LocaleList.getEmptyLocaleList() else LocaleList.forLanguageTags(tag)
+        } else {
+            openSettings(Intent(Settings.ACTION_LOCALE_SETTINGS))
+        }
+    }
+
+    /** Pulls down the notification shade. No public API; StatusBarManager has done this for years. */
+    @SuppressLint("WrongConstant")
+    private fun expandNotifications() {
+        runCatching {
+            val statusBar = getSystemService("statusbar")
+            statusBar.javaClass.getMethod("expandNotificationsPanel").invoke(statusBar)
+        }
+    }
+
+    private fun shareText(text: String) {
+        val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+        startActivity(Intent.createChooser(send, null))
+    }
+
+    private fun formatDateTime(time: Long): String =
+        SimpleDateFormat(DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEdMMMjmm"), Locale.getDefault()).format(Date(time))
+
+    private fun openSettings(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            toast(getString(R.string.settings_open_failed))
+        }
+    }
+
+    private fun toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}

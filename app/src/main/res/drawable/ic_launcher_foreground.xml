@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    "unloop" wordmark: monoline letters in off-white, with the "oo" drawn as a lime infinity
+    loop that is broken open at the top right. Drawn in a 280 x 88 unit box (x-height 0..50,
+    ascender -18, descender 70, stroke 10), then scaled into the adaptive-icon safe zone.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.2"
+        android:scaleY="0.2"
+        android:translateX="26"
+        android:translateY="48.8">
+        <!-- u -->
+        <path
+            android:pathData="M5,0 V33 A12,12 0 0 0 29,33 V0"
+            android:strokeWidth="10"
+            android:strokeColor="@color/icon_ink" />
+        <!-- n -->
+        <path
+            android:pathData="M51,50 V17 A12,12 0 0 1 75,17 V50"
+            android:strokeWidth="10"
+            android:strokeColor="@color/icon_ink" />
+        <!-- l -->
+        <path
+            android:pathData="M97,-18 V50"
+            android:strokeWidth="10"
+            android:strokeColor="@color/icon_ink" />
+        <!-- oo: infinity loop, open at the top of the right lobe -->
+        <path
+            android:pathData="M203,6.5 C209.5,9 213,16 213,25 C213,36 206,45 195,45 C186,45 180,40 166,25 C152,10 146,5 137,5 C126,5 119,14 119,25 C119,36 126,45 137,45 C146,45 152,40 166,25 C176,14 181,8.5 188,6"
+            android:strokeWidth="10"
+            android:strokeColor="@color/lime" />
+        <!-- p: stem + bowl -->
+        <path
+            android:pathData="M235,0 V70"
+            android:strokeWidth="10"
+            android:strokeColor="@color/icon_ink" />
+        <path
+            android:pathData="M235,25 A20,20 0 1 0 275,25 A20,20 0 1 0 235,25 Z"
+            android:strokeWidth="10"
+            android:strokeColor="@color/icon_ink" />
+    </group>
+</vector>

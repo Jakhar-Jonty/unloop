@@ -1,0 +1,13 @@
+<resources>
+    <style name="Theme.Unloop" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <color name="bg">#FF0A0A0A</color>
+    <color name="lime">#FFD4F25A</color>
+    <color name="icon_bg">#FF0A0A0A</color>
+    <color name="icon_ink">#FFF2F0EA</color>
+</resources>
