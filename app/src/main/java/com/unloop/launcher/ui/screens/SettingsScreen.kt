@@ -126,6 +126,7 @@ fun SettingsScreen(
     onGestures: (Boolean) -> Unit,
     onGrantDnd: () -> Unit,
     onSetAppLimit: (String, Int?) -> Unit,
+    onLockWallpaper: (Boolean) -> Unit,
 ) {
     var page by rememberSaveable { mutableStateOf<Page?>(null) }
     var picker by remember { mutableStateOf<Picker?>(null) }
@@ -198,6 +199,13 @@ fun SettingsScreen(
                             stringResource(R.string.next_event_setting),
                             on = state.showNextEvent && state.hasCalendarAccess,
                             onClick = { onShowNextEvent(!(state.showNextEvent && state.hasCalendarAccess)) },
+                        )
+                        Divider()
+                        SwitchRow(
+                            stringResource(R.string.lock_wallpaper),
+                            hint = stringResource(R.string.lock_wallpaper_hint),
+                            on = state.lockWallpaper,
+                            onClick = { onLockWallpaper(!state.lockWallpaper) },
                         )
                         Divider()
                         SwitchRow(

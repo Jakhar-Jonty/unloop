@@ -17,6 +17,7 @@ import com.unloop.launcher.MainActivity
 import com.unloop.launcher.PauseActivity
 import com.unloop.launcher.data.Gate
 import com.unloop.launcher.data.Gatekeeper
+import com.unloop.launcher.data.LockWallpaper
 import com.unloop.launcher.data.Prefs
 import com.unloop.launcher.data.UsageRepository
 import java.util.concurrent.Executors
@@ -46,6 +47,8 @@ class UnloopAccessibilityService : AccessibilityService() {
             Gatekeeper.clearPass()
             foreground = null
             main.removeCallbacks(limitCheck)
+            // Fresh numbers on the lock screen the user is about to see.
+            worker.execute { LockWallpaper.update(this@UnloopAccessibilityService) }
         }
     }
 

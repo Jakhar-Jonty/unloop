@@ -102,6 +102,20 @@ class Prefs(context: Context) {
         get() = sp.getLong("schedule_skip_until", 0L)
         set(value) = sp.edit { putLong("schedule_skip_until", value) }
 
+    /** Unloop draws today's screen time, streak and a quote as the lock-screen wallpaper. */
+    var lockWallpaper: Boolean
+        get() = sp.getBoolean("lock_wallpaper", false)
+        set(value) = sp.edit { putBoolean("lock_wallpaper", value) }
+
+    var lastWallpaperAt: Long
+        get() = sp.getLong("last_wallpaper_at", 0L)
+        set(value) = sp.edit { putLong("last_wallpaper_at", value) }
+
+    /** Last computed streak, so the wallpaper can be drawn without the launcher running. */
+    var lastStreak: Int
+        get() = sp.getInt("last_streak", 0)
+        set(value) = sp.edit { putInt("last_streak", value) }
+
     /** Day (yyyyMMdd) the weekly reflection was last opened, to stop nagging. */
     var reflectionSeenDay: String
         get() = sp.getString("reflection_seen", "").orEmpty()

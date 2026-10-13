@@ -307,4 +307,10 @@
     <string name="optional">ज़रूरी नहीं</string>
     <string name="add_app">+  ऐप जोड़ें</string>
     <string name="done">हो गया</string>
+    <string name="lock_wallpaper">लॉक स्क्रीन वॉलपेपर</string>
+    <string name="lock_wallpaper_hint">लॉक स्क्रीन पर आज का स्क्रीन टाइम, आपकी लगातार दिनों की गिनती और एक विचार दिखाता है। बंद करने पर फ़ोन का डिफ़ॉल्ट लॉक वॉलपेपर वापस आ जाएगा।</string>
+    <plurals name="streak_label">
+        <item quantity="one">लगातार %d दिन</item>
+        <item quantity="other">लगातार %d दिन</item>
+    </plurals>
 </resources>

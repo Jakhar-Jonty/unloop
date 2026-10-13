@@ -19,6 +19,7 @@ import com.unloop.launcher.data.Schedule
 import com.unloop.launcher.data.ScheduleController
 import com.unloop.launcher.service.UnloopAccessibilityService
 import com.unloop.launcher.data.History
+import com.unloop.launcher.data.LockWallpaper
 import com.unloop.launcher.data.MAX_FAVORITES
 import com.unloop.launcher.data.NextEvent
 import com.unloop.launcher.data.Prefs
@@ -73,6 +74,7 @@ data class UiState(
     val focusSchedule: String = "",
     /** The accessibility service is on, so pauses and limits apply to apps opened anywhere. */
     val pauseEverywhere: Boolean = false,
+    val lockWallpaper: Boolean = false,
 ) {
     fun isFocusing(now: Long = System.currentTimeMillis()): Boolean = now < focusUntil
 
@@ -181,6 +183,11 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
                 history.saveUsage(History.startOfDay(System.currentTimeMillis()), usage.totalMs, usage.unlocks, known = true)
             }
             val streak = if (hasAccess) withContext(Dispatchers.Default) { completedStreak() } else null
+            if (streak != null) prefs.lastStreak = streak
+            // Keep the lock-screen wallpaper reasonably fresh while the launcher is in use.
+            if (prefs.lockWallpaper && System.currentTimeMillis() - prefs.lastWallpaperAt > 15 * 60_000L) {
+                withContext(Dispatchers.IO) { LockWallpaper.update(getApplication()) }
+            }
             val event = if (prefs.showNextEvent) withContext(Dispatchers.IO) { calendarRepo.next() } else null
             _state.update { it.copy(hasUsageAccess = hasAccess, usage = usage, streak = streak, nextEvent = event) }
             usage?.let { labelUnknown(it.perApp.keys) }
@@ -299,6 +306,14 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
         if (seconds < prefs.pauseStepSeconds && blockedByStrict()) return
         prefs.pauseStepSeconds = seconds
         publish()
+    }
+
+    fun setLockWallpaper(on: Boolean) {
+        prefs.lockWallpaper = on
+        publish()
+        viewModelScope.launch(Dispatchers.IO) {
+            if (on) LockWallpaper.update(getApplication(), force = true) else LockWallpaper.clear(getApplication())
+        }
     }
 
     fun setGestures(on: Boolean) {
@@ -451,6 +466,7 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
                 appLimits = prefs.appLimits,
                 pauseStepSeconds = prefs.pauseStepSeconds,
                 gestures = prefs.gestures,
+                lockWallpaper = prefs.lockWallpaper,
                 schedules = prefs.schedules,
                 focusSchedule = prefs.focusSchedule,
             )
