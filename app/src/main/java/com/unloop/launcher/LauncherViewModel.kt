@@ -19,6 +19,8 @@ import com.unloop.launcher.data.Schedule
 import com.unloop.launcher.data.ScheduleController
 import com.unloop.launcher.service.UnloopAccessibilityService
 import com.unloop.launcher.data.History
+import com.unloop.launcher.data.LOCK_BOTTOM
+import com.unloop.launcher.data.LOCK_COMPACT
 import com.unloop.launcher.data.LockWallpaper
 import com.unloop.launcher.data.MAX_FAVORITES
 import com.unloop.launcher.data.NextEvent
@@ -75,6 +77,8 @@ data class UiState(
     /** The accessibility service is on, so pauses and limits apply to apps opened anywhere. */
     val pauseEverywhere: Boolean = false,
     val lockWallpaper: Boolean = false,
+    val lockStyle: String = LOCK_COMPACT,
+    val lockPosition: String = LOCK_BOTTOM,
 ) {
     fun isFocusing(now: Long = System.currentTimeMillis()): Boolean = now < focusUntil
 
@@ -316,6 +320,18 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun setLockStyle(style: String) {
+        prefs.lockStyle = style
+        publish()
+        viewModelScope.launch(Dispatchers.IO) { LockWallpaper.update(getApplication(), force = true) }
+    }
+
+    fun setLockPosition(position: String) {
+        prefs.lockPosition = position
+        publish()
+        viewModelScope.launch(Dispatchers.IO) { LockWallpaper.update(getApplication(), force = true) }
+    }
+
     fun setGestures(on: Boolean) {
         prefs.gestures = on
         publish()
@@ -467,6 +483,8 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
                 pauseStepSeconds = prefs.pauseStepSeconds,
                 gestures = prefs.gestures,
                 lockWallpaper = prefs.lockWallpaper,
+                lockStyle = prefs.lockStyle,
+                lockPosition = prefs.lockPosition,
                 schedules = prefs.schedules,
                 focusSchedule = prefs.focusSchedule,
             )

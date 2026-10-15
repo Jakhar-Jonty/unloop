@@ -315,4 +315,12 @@
         <item quantity="one">%d-day streak</item>
         <item quantity="other">%d-day streak</item>
     </plurals>
+    <string name="lock_layout">Layout</string>
+    <string name="lock_compact">Compact</string>
+    <string name="lock_full">Full</string>
+    <string name="lock_position">Position</string>
+    <string name="lock_top">Top</string>
+    <string name="lock_middle">Middle</string>
+    <string name="lock_bottom">Bottom</string>
+    <string name="lock_position_hint">Every phone puts its lock clock somewhere different. Pick the spot that stays clear on yours.</string>
 </resources>

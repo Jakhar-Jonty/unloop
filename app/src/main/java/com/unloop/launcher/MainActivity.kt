@@ -236,6 +236,8 @@ class MainActivity : ComponentActivity() {
                     onGrantDnd = { openSettings(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) },
                     onSetAppLimit = vm::setAppLimit,
                     onLockWallpaper = vm::setLockWallpaper,
+                    onLockStyle = vm::setLockStyle,
+                    onLockPosition = vm::setLockPosition,
                     onGrantUsage = ::openUsageAccess,
                     onSetDefault = ::requestDefaultLauncher,
                 )

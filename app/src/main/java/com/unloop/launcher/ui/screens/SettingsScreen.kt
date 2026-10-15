@@ -1,5 +1,20 @@
 package com.unloop.launcher.ui.screens
 
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import com.unloop.launcher.data.LockWallpaper
+import com.unloop.launcher.data.LOCK_TOP
+import com.unloop.launcher.data.LOCK_MIDDLE
+import com.unloop.launcher.data.LOCK_FULL
+import com.unloop.launcher.data.LOCK_COMPACT
+import com.unloop.launcher.data.LOCK_BOTTOM
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.runtime.produceState
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.border
+import androidx.compose.foundation.Image
 import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -127,6 +142,8 @@ fun SettingsScreen(
     onGrantDnd: () -> Unit,
     onSetAppLimit: (String, Int?) -> Unit,
     onLockWallpaper: (Boolean) -> Unit,
+    onLockStyle: (String) -> Unit,
+    onLockPosition: (String) -> Unit,
 ) {
     var page by rememberSaveable { mutableStateOf<Page?>(null) }
     var picker by remember { mutableStateOf<Picker?>(null) }
@@ -207,6 +224,7 @@ fun SettingsScreen(
                             on = state.lockWallpaper,
                             onClick = { onLockWallpaper(!state.lockWallpaper) },
                         )
+                        if (state.lockWallpaper) LockWallpaperOptions(state, onLockStyle, onLockPosition)
                         Divider()
                         SwitchRow(
                             stringResource(R.string.gestures),
@@ -906,5 +924,48 @@ private fun ScheduleSheet(schedule: Schedule, onDismiss: () -> Unit, onSave: (Sc
             },
             modifier = Modifier.fillMaxWidth(),
         )
+    }
+}
+
+/** Layout and position for the lock-screen wallpaper, with a live preview of the result. */
+@Composable
+private fun LockWallpaperOptions(state: UiState, onStyle: (String) -> Unit, onPosition: (String) -> Unit) {
+    val context = LocalContext.current
+    val preview by produceState<ImageBitmap?>(null, state.lockStyle, state.lockPosition, state.limitMinutes) {
+        value = withContext(Dispatchers.Default) {
+            LockWallpaper.preview(context, state.lockStyle, state.lockPosition, width = 360).asImageBitmap()
+        }
+    }
+    Row(Modifier.padding(bottom = 18.dp), verticalAlignment = Alignment.Top) {
+        Column(Modifier.weight(1f)) {
+            Label(stringResource(R.string.lock_layout))
+            Spacer(Modifier.height(8.dp))
+            ChipRow {
+                Chip(stringResource(R.string.lock_compact), selected = state.lockStyle == LOCK_COMPACT, onClick = { onStyle(LOCK_COMPACT) })
+                Chip(stringResource(R.string.lock_full), selected = state.lockStyle == LOCK_FULL, onClick = { onStyle(LOCK_FULL) })
+            }
+            Spacer(Modifier.height(16.dp))
+            Label(stringResource(R.string.lock_position))
+            Spacer(Modifier.height(8.dp))
+            ChipRow {
+                listOf(LOCK_TOP to R.string.lock_top, LOCK_MIDDLE to R.string.lock_middle, LOCK_BOTTOM to R.string.lock_bottom).forEach { (pos, name) ->
+                    Chip(stringResource(name), selected = state.lockPosition == pos, onClick = { onPosition(pos) })
+                }
+            }
+            Spacer(Modifier.height(10.dp))
+            Hint(stringResource(R.string.lock_position_hint))
+        }
+        Spacer(Modifier.width(14.dp))
+        // Phone-shaped preview of exactly what will be set.
+        Box(
+            Modifier
+                .width(96.dp)
+                .aspectRatio(9f / 20f)
+                .clip(RoundedCornerShape(14.dp))
+                .background(UnloopColors.Bg)
+                .border(1.dp, UnloopColors.Border, RoundedCornerShape(14.dp)),
+        ) {
+            preview?.let { Image(it, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize()) }
+        }
     }
 }

@@ -313,4 +313,12 @@
         <item quantity="one">लगातार %d दिन</item>
         <item quantity="other">लगातार %d दिन</item>
     </plurals>
+    <string name="lock_layout">लेआउट</string>
+    <string name="lock_compact">छोटा</string>
+    <string name="lock_full">पूरा</string>
+    <string name="lock_position">जगह</string>
+    <string name="lock_top">ऊपर</string>
+    <string name="lock_middle">बीच में</string>
+    <string name="lock_bottom">नीचे</string>
+    <string name="lock_position_hint">हर फ़ोन में लॉक स्क्रीन की घड़ी अलग जगह होती है। वह जगह चुनें जो आपके फ़ोन पर खाली रहे।</string>
 </resources>

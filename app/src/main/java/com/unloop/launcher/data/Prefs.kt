@@ -107,6 +107,16 @@ class Prefs(context: Context) {
         get() = sp.getBoolean("lock_wallpaper", false)
         set(value) = sp.edit { putBoolean("lock_wallpaper", value) }
 
+    /** "compact" (card only) or "full" (card, plant and quote). */
+    var lockStyle: String
+        get() = sp.getString("lock_style", LOCK_COMPACT).orEmpty()
+        set(value) = sp.edit { putString("lock_style", value) }
+
+    /** Where the card sits, so it can dodge each phone's own lock clock: "top", "middle" or "bottom". */
+    var lockPosition: String
+        get() = sp.getString("lock_position", LOCK_BOTTOM).orEmpty()
+        set(value) = sp.edit { putString("lock_position", value) }
+
     var lastWallpaperAt: Long
         get() = sp.getLong("last_wallpaper_at", 0L)
         set(value) = sp.edit { putLong("last_wallpaper_at", value) }
@@ -123,6 +133,12 @@ class Prefs(context: Context) {
 }
 
 const val FOCUS_UNTIL_STOPPED = Long.MAX_VALUE
+
+const val LOCK_COMPACT = "compact"
+const val LOCK_FULL = "full"
+const val LOCK_TOP = "top"
+const val LOCK_MIDDLE = "middle"
+const val LOCK_BOTTOM = "bottom"
 
 /** First-run picks: core apps on the home screen, known time sinks behind the pause. */
 object Defaults {
