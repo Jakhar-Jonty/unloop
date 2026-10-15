@@ -35,11 +35,18 @@ fun plantStage(streak: Int): Int = when {
 fun Plant(streak: Int, wilting: Boolean, modifier: Modifier = Modifier) {
     val stage = plantStage(streak)
     val wilt by animateFloatAsState(if (wilting) 1f else 0f, tween(600), label = "wilt")
+    Canvas(modifier) { drawPlant(stage, wilt) }
+}
+
+/**
+ * Draws the plant for [stage] (0 seed … 5 tree) filling this draw scope. [wilt] 0..1 fades it to
+ * grey and droops the leaves. Shared by the home screen and the lock-screen wallpaper.
+ */
+fun DrawScope.drawPlant(stage: Int, wilt: Float) {
     val leafColor = lerp(UnloopColors.Lime, UnloopColors.Muted, wilt)
     val stemColor = lerp(UnloopColors.LimeEdge, UnloopColors.Faint, wilt)
     val flowerColor = lerp(UnloopColors.Orange, UnloopColors.Muted, wilt)
-
-    Canvas(modifier) {
+    run {
         val w = size.width
         val h = size.height
         val ground = h * 0.92f
@@ -49,8 +56,11 @@ fun Plant(streak: Int, wilting: Boolean, modifier: Modifier = Modifier) {
         drawLine(UnloopColors.Border, Offset(w * 0.18f, ground), Offset(w * 0.82f, ground), strokeWidth = h * 0.05f, cap = StrokeCap.Round)
 
         if (stage == 0) {
-            drawOval(stemColor, topLeft = Offset(cx - w * 0.08f, ground - h * 0.1f), size = Size(w * 0.16f, h * 0.09f))
-            return@Canvas
+            // A seed with the first hint of a shoot, so day 0 still reads as "something to grow".
+            drawOval(stemColor, topLeft = Offset(cx - w * 0.14f, ground - h * 0.16f), size = Size(w * 0.28f, h * 0.15f))
+            drawLine(leafColor, Offset(cx, ground - h * 0.14f), Offset(cx, ground - h * 0.3f), strokeWidth = w * 0.05f, cap = StrokeCap.Round)
+            leaf(Offset(cx, ground - h * 0.3f), w * 0.16f, -40f + wilt * 70f, leafColor)
+            return@run
         }
 
         val stemTop = ground - h * listOf(0f, 0.3f, 0.48f, 0.62f, 0.7f, 0.78f)[stage]
@@ -63,7 +73,7 @@ fun Plant(streak: Int, wilting: Boolean, modifier: Modifier = Modifier) {
                 .forEach { drawCircle(leafColor, radius = r, center = it) }
             listOf(Offset(cx - r * 0.5f, stemTop - r * 0.6f), Offset(cx + r * 0.7f, stemTop), Offset(cx - r * 1.1f, stemTop + r * 0.3f))
                 .forEach { drawCircle(flowerColor, radius = w * 0.045f, center = it) }
-            return@Canvas
+            return@run
         }
 
         // Pairs of leaves up the stem; wilting tips them downward.
