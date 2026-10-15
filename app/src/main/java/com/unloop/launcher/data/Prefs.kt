@@ -84,6 +84,10 @@ class Prefs(context: Context) {
         get() = sp.getInt("pause_step", 2)
         set(value) = sp.edit { putInt("pause_step", value) }
 
+    var showTasks: Boolean
+        get() = sp.getBoolean("show_tasks", true)
+        set(value) = sp.edit { putBoolean("show_tasks", value) }
+
     var gestures: Boolean
         get() = sp.getBoolean("gestures", true)
         set(value) = sp.edit { putBoolean("gestures", value) }

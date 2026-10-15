@@ -268,7 +268,7 @@
         <item>S</item>
     </string-array>
     <string name="gestures">Gestures</string>
-    <string name="gestures_hint">Swipe up: all apps · Swipe down: notifications · Swipe right: camera · Double-tap: lock screen</string>
+    <string name="gestures_hint">Swipe up: all apps · Swipe down: notifications · Swipe right: camera · Swipe left: to-do · Double-tap: lock screen</string>
     <string name="lock_needs_accessibility">Turn on Pause everywhere in Settings to lock with a double-tap.</string>
     <!-- Settings overview -->
     <string name="cat_screen_time">Screen time</string>
@@ -323,4 +323,25 @@
     <string name="lock_middle">Middle</string>
     <string name="lock_bottom">Bottom</string>
     <string name="lock_position_hint">Every phone puts its lock clock somewhere different. Pick the spot that stays clear on yours.</string>
+    <!-- To-do and notes -->
+    <string name="todo">To-do</string>
+    <string name="notes_tab">Notes</string>
+    <plurals name="tasks_left">
+        <item quantity="one">%d left</item>
+        <item quantity="other">%d left</item>
+    </plurals>
+    <string name="add_task_hint">Add a task</string>
+    <string name="add_short">+ Add</string>
+    <string name="nothing_to_do">Nothing on your list. Enjoy it.</string>
+    <string name="done_section">Done</string>
+    <string name="clear_done">Clear done</string>
+    <string name="task_note_hint">Add a note…</string>
+    <string name="delete">Delete</string>
+    <string name="new_note">+ New note</string>
+    <string name="note_hint">Write something…</string>
+    <string name="no_notes">No notes yet.</string>
+    <string name="empty_note">Empty note</string>
+    <string name="show_tasks">To-do on home</string>
+    <string name="show_tasks_hint">Your next three tasks on the home screen. Swipe left on home for the full list and notes.</string>
+    <string name="just_now">Just now</string>
 </resources>

@@ -144,6 +144,7 @@ fun SettingsScreen(
     onLockWallpaper: (Boolean) -> Unit,
     onLockStyle: (String) -> Unit,
     onLockPosition: (String) -> Unit,
+    onShowTasks: (Boolean) -> Unit,
 ) {
     var page by rememberSaveable { mutableStateOf<Page?>(null) }
     var picker by remember { mutableStateOf<Picker?>(null) }
@@ -210,6 +211,13 @@ fun SettingsScreen(
             Page.Home -> PageScaffold(Page.Home, onBack = { page = null }) {
                 item {
                     Group {
+                        SwitchRow(
+                            stringResource(R.string.show_tasks),
+                            hint = stringResource(R.string.show_tasks_hint),
+                            on = state.showTasks,
+                            onClick = { onShowTasks(!state.showTasks) },
+                        )
+                        Divider()
                         SwitchRow(stringResource(R.string.daily_quote), on = state.showQuote, onClick = { onShowQuote(!state.showQuote) })
                         Divider()
                         SwitchRow(

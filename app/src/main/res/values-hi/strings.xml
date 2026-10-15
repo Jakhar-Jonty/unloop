@@ -266,7 +266,7 @@
         <item>र</item>
     </string-array>
     <string name="gestures">जेस्चर</string>
-    <string name="gestures_hint">ऊपर स्वाइप: सभी ऐप्स · नीचे स्वाइप: नोटिफ़िकेशन · दाएँ स्वाइप: कैमरा · दो बार टैप: स्क्रीन लॉक</string>
+    <string name="gestures_hint">ऊपर स्वाइप: सभी ऐप्स · नीचे स्वाइप: नोटिफ़िकेशन · दाएँ स्वाइप: कैमरा · बाएँ स्वाइप: करने के काम · दो बार टैप: स्क्रीन लॉक</string>
     <string name="lock_needs_accessibility">दो बार टैप से लॉक करने के लिए सेटिंग्स में “हर जगह ठहराव” चालू करें।</string>
     <!-- Settings overview -->
     <string name="cat_screen_time">स्क्रीन टाइम</string>
@@ -321,4 +321,25 @@
     <string name="lock_middle">बीच में</string>
     <string name="lock_bottom">नीचे</string>
     <string name="lock_position_hint">हर फ़ोन में लॉक स्क्रीन की घड़ी अलग जगह होती है। वह जगह चुनें जो आपके फ़ोन पर खाली रहे।</string>
+    <!-- To-do and notes -->
+    <string name="todo">करने के काम</string>
+    <string name="notes_tab">नोट्स</string>
+    <plurals name="tasks_left">
+        <item quantity="one">%d बाकी</item>
+        <item quantity="other">%d बाकी</item>
+    </plurals>
+    <string name="add_task_hint">नया काम लिखें</string>
+    <string name="add_short">+ जोड़ें</string>
+    <string name="nothing_to_do">सूची खाली है। आराम कीजिए।</string>
+    <string name="done_section">हो गए</string>
+    <string name="clear_done">हो गए हटाएं</string>
+    <string name="task_note_hint">नोट जोड़ें…</string>
+    <string name="delete">हटाएं</string>
+    <string name="new_note">+ नया नोट</string>
+    <string name="note_hint">कुछ लिखें…</string>
+    <string name="no_notes">अभी कोई नोट नहीं।</string>
+    <string name="empty_note">खाली नोट</string>
+    <string name="show_tasks">होम पर करने के काम</string>
+    <string name="show_tasks_hint">होम स्क्रीन पर आपके अगले तीन काम। पूरी सूची और नोट्स के लिए होम पर बाएँ स्वाइप करें।</string>
+    <string name="just_now">अभी-अभी</string>
 </resources>

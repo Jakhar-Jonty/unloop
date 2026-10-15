@@ -24,6 +24,9 @@ import com.unloop.launcher.data.LOCK_COMPACT
 import com.unloop.launcher.data.LockWallpaper
 import com.unloop.launcher.data.MAX_FAVORITES
 import com.unloop.launcher.data.NextEvent
+import com.unloop.launcher.data.Note
+import com.unloop.launcher.data.Task
+import com.unloop.launcher.data.TaskStore
 import com.unloop.launcher.data.Prefs
 import com.unloop.launcher.data.UsageRepository
 import kotlinx.coroutines.Dispatchers
@@ -79,7 +82,14 @@ data class UiState(
     val lockWallpaper: Boolean = false,
     val lockStyle: String = LOCK_COMPACT,
     val lockPosition: String = LOCK_BOTTOM,
+    val tasks: List<Task> = emptyList(),
+    val notes: List<Note> = emptyList(),
+    val showTasks: Boolean = true,
 ) {
+    /** Open tasks first (oldest first), then done ones (most recently finished first). */
+    val openTasks: List<Task> get() = tasks.filter { !it.done }.sortedBy { it.createdAt }
+    val doneTasks: List<Task> get() = tasks.filter { it.done }.sortedByDescending { it.doneAt }
+
     fun isFocusing(now: Long = System.currentTimeMillis()): Boolean = now < focusUntil
 
     fun isStrict(now: Long = System.currentTimeMillis()): Boolean = now < strictUntil
@@ -117,6 +127,7 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
     private val calendarRepo = CalendarRepository(app)
     private val prefs = Prefs(app)
     private val history = History(app)
+    private val taskStore = TaskStore(app)
     private val roleManager = app.getSystemService(RoleManager::class.java)
 
     private val _state = MutableStateFlow(UiState())
@@ -137,7 +148,7 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
     private val quoteCount = app.resources.getStringArray(R.array.quotes).size
 
     init {
-        _state.update { it.copy(quoteIndex = Random.nextInt(quoteCount)) }
+        _state.update { it.copy(quoteIndex = Random.nextInt(quoteCount), tasks = taskStore.tasks(), notes = taskStore.notes()) }
         reloadApps()
     }
 
@@ -332,6 +343,60 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) { LockWallpaper.update(getApplication(), force = true) }
     }
 
+    // --- To-do and notes ---------------------------------------------------------------------
+
+    fun addTask(title: String) {
+        val text = title.trim()
+        if (text.isEmpty()) return
+        saveTasks(_state.value.tasks + Task(id = System.nanoTime(), title = text))
+    }
+
+    fun toggleTask(id: Long) = saveTasks(
+        _state.value.tasks.map {
+            if (it.id == id) it.copy(done = !it.done, doneAt = if (it.done) 0L else System.currentTimeMillis()) else it
+        },
+    )
+
+    fun updateTask(id: Long, title: String, note: String) {
+        if (title.isBlank()) return deleteTask(id)
+        saveTasks(_state.value.tasks.map { if (it.id == id) it.copy(title = title.trim(), note = note.trim()) else it })
+    }
+
+    fun deleteTask(id: Long) = saveTasks(_state.value.tasks.filterNot { it.id == id })
+
+    fun clearDoneTasks() = saveTasks(_state.value.tasks.filterNot { it.done })
+
+    /** Creates an empty note and returns its id, so the editor can open it. */
+    fun newNote(): Long {
+        val note = Note(id = System.nanoTime(), text = "")
+        saveNotes(listOf(note) + _state.value.notes)
+        return note.id
+    }
+
+    fun updateNote(id: Long, text: String) = saveNotes(
+        _state.value.notes.map { if (it.id == id) it.copy(text = text, updatedAt = System.currentTimeMillis()) else it },
+    )
+
+    fun deleteNote(id: Long) = saveNotes(_state.value.notes.filterNot { it.id == id })
+
+    /** Notes left empty when the editor closes are not worth keeping. */
+    fun dropEmptyNotes() = saveNotes(_state.value.notes.filter { it.text.isNotBlank() })
+
+    fun setShowTasks(on: Boolean) {
+        prefs.showTasks = on
+        publish()
+    }
+
+    private fun saveTasks(tasks: List<Task>) {
+        taskStore.saveTasks(tasks)
+        _state.update { it.copy(tasks = tasks) }
+    }
+
+    private fun saveNotes(notes: List<Note>) {
+        taskStore.saveNotes(notes)
+        _state.update { it.copy(notes = notes) }
+    }
+
     fun setGestures(on: Boolean) {
         prefs.gestures = on
         publish()
@@ -485,6 +550,7 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
                 lockWallpaper = prefs.lockWallpaper,
                 lockStyle = prefs.lockStyle,
                 lockPosition = prefs.lockPosition,
+                showTasks = prefs.showTasks,
                 schedules = prefs.schedules,
                 focusSchedule = prefs.focusSchedule,
             )

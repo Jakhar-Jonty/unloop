@@ -99,6 +99,9 @@ fun HomeScreen(
     onNotifications: () -> Unit,
     onCamera: () -> Unit,
     onLock: () -> Unit,
+    onOpenTasks: () -> Unit,
+    onToggleTask: (Long) -> Unit,
+    onAddTask: () -> Unit,
     onGrantUsage: () -> Unit,
     onSetDefault: () -> Unit,
     onMinuteTick: () -> Unit,
@@ -135,6 +138,7 @@ fun HomeScreen(
                             abs(dy) > abs(dx) && dy < -threshold && !focusing -> onAllApps()
                             abs(dy) > abs(dx) && dy > threshold && state.gestures -> onNotifications()
                             abs(dx) > abs(dy) && dx > threshold && state.gestures -> onCamera()
+                            abs(dx) > abs(dy) && dx < -threshold && state.gestures -> onOpenTasks()
                         }
                     },
                 ) { change, amount ->
@@ -207,6 +211,10 @@ fun HomeScreen(
                 onGrant = onGrantUsage,
                 onWeek = onWeek,
             )
+            if (state.showTasks) {
+                Spacer(Modifier.height(16.dp))
+                TasksCard(state, onOpen = onOpenTasks, onToggle = onToggleTask, onAdd = onAddTask)
+            }
             if (state.showReflectionNudge && state.hasUsageAccess) {
                 Spacer(Modifier.height(14.dp))
                 Label(
@@ -587,4 +595,57 @@ fun scheduleName(id: String): String? = when (id) {
     Schedule.WIND_DOWN -> stringResource(R.string.schedule_wind_down)
     Schedule.SLEEP -> stringResource(R.string.schedule_sleep)
     else -> null
+}
+
+/** Next three open tasks with checks. Tapping the card opens the full list. */
+@Composable
+private fun TasksCard(state: UiState, onOpen: () -> Unit, onToggle: (Long) -> Unit, onAdd: () -> Unit) {
+    val open = state.openTasks
+    PopCard(
+        modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onOpen,
+        ),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Label(stringResource(R.string.todo), modifier = Modifier.weight(1f))
+            if (open.isNotEmpty()) {
+                Text(pluralStringResource(R.plurals.tasks_left, open.size, open.size), color = UnloopColors.TextSoft, fontFamily = Mono, fontSize = 12.sp)
+            }
+        }
+        Spacer(Modifier.height(6.dp))
+        if (open.isEmpty()) {
+            Text(
+                stringResource(R.string.nothing_to_do),
+                color = UnloopColors.Muted,
+                fontFamily = Display,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(vertical = 6.dp),
+            )
+        }
+        open.take(3).forEach { task ->
+            Row(Modifier.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                TaskCheck(done = false, onClick = { onToggle(task.id) }, size = 22)
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    task.title,
+                    fontFamily = Display,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 17.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+        Label(
+            stringResource(R.string.add_short),
+            color = UnloopColors.Lime,
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable(onClick = onAdd)
+                .padding(top = 8.dp, bottom = 2.dp),
+        )
+    }
 }

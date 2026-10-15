@@ -66,6 +66,9 @@ import com.unloop.launcher.ui.screens.HomeScreen
 import com.unloop.launcher.ui.screens.PauseScreen
 import com.unloop.launcher.ui.screens.ReflectionScreen
 import com.unloop.launcher.ui.screens.SettingsScreen
+import com.unloop.launcher.ui.screens.AddTaskSheet
+import com.unloop.launcher.ui.screens.TaskActions
+import com.unloop.launcher.ui.screens.TasksScreen
 import com.unloop.launcher.ui.screens.StartFocusSheet
 import com.unloop.launcher.ui.screens.UnloopSheet
 import com.unloop.launcher.ui.theme.Display
@@ -82,6 +85,7 @@ private sealed interface Screen {
     data object AllApps : Screen
     data object Settings : Screen
     data object Reflection : Screen
+    data object Tasks : Screen
     data class Pause(val app: AppInfo, val gate: Gate) : Screen
 }
 
@@ -138,6 +142,20 @@ class MainActivity : ComponentActivity() {
         var focusSheet by remember { mutableStateOf<FocusSheet?>(null) }
         var plantSheet by remember { mutableStateOf(false) }
         var limitApp by remember { mutableStateOf<AppInfo?>(null) }
+        var addingTask by remember { mutableStateOf(false) }
+        val taskActions = remember {
+            TaskActions(
+                add = vm::addTask,
+                toggle = vm::toggleTask,
+                update = vm::updateTask,
+                delete = vm::deleteTask,
+                clearDone = vm::clearDoneTasks,
+                newNote = vm::newNote,
+                updateNote = vm::updateNote,
+                deleteNote = vm::deleteNote,
+                dropEmptyNotes = vm::dropEmptyNotes,
+            )
+        }
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(homePresses) {
@@ -146,6 +164,7 @@ class MainActivity : ComponentActivity() {
             focusSheet = null
             plantSheet = false
             limitApp = null
+            addingTask = false
         }
 
         LaunchedEffect(Unit) {
@@ -188,6 +207,9 @@ class MainActivity : ComponentActivity() {
                     onPlant = { plantSheet = true },
                     onNotifications = ::expandNotifications,
                     onCamera = { openSettings(Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA)) },
+                    onOpenTasks = { screen = Screen.Tasks },
+                    onToggleTask = vm::toggleTask,
+                    onAddTask = { addingTask = true },
                     onLock = {
                         if (UnloopAccessibilityService.instance?.lockScreen() != true) {
                             toast(getString(R.string.lock_needs_accessibility))
@@ -204,6 +226,7 @@ class MainActivity : ComponentActivity() {
                     onBack = { screen = Screen.Home },
                     onSettings = { screen = Screen.Settings },
                 )
+                Screen.Tasks -> TasksScreen(state = state, actions = taskActions, onBack = { screen = Screen.Home })
                 Screen.Reflection -> ReflectionScreen(
                     state = state,
                     onBack = { screen = Screen.Home },
@@ -238,6 +261,7 @@ class MainActivity : ComponentActivity() {
                     onLockWallpaper = vm::setLockWallpaper,
                     onLockStyle = vm::setLockStyle,
                     onLockPosition = vm::setLockPosition,
+                    onShowTasks = vm::setShowTasks,
                     onGrantUsage = ::openUsageAccess,
                     onSetDefault = ::requestDefaultLauncher,
                 )
@@ -327,6 +351,16 @@ class MainActivity : ComponentActivity() {
                 },
             )
             null -> Unit
+        }
+
+        if (addingTask) {
+            AddTaskSheet(
+                onDismiss = { addingTask = false },
+                onAdd = { title ->
+                    vm.addTask(title)
+                    addingTask = false
+                },
+            )
         }
 
         limitApp?.let { app ->
