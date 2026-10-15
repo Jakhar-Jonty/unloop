@@ -375,7 +375,7 @@
     <string name="ob_turn_on">चालू करें</string>
     <string name="ob_done_title">सब तैयार है।</string>
     <string name="ob_done_body">"आज" के लिए होम पर बाएँ स्वाइप करें, सेटिंग्स के लिए घड़ी को दबाकर रखें। अपने पौधे का ध्यान रखिए।</string>
-    <string name="ob_go">Unloop शुरू करें</string>
+    <string name="ob_go">मुझे होम ले चलिए</string>
     <string name="ob_next">आगे</string>
     <string name="ob_later">अभी नहीं</string>
     <string name="ob_done_check">हो गया</string>
