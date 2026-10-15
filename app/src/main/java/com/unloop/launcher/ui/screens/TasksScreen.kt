@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -381,6 +382,7 @@ fun UnloopTextField(
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
     singleLine: Boolean = true,
+    container: Color = UnloopColors.Surface,
 ) {
     val shape = RoundedCornerShape(if (singleLine) 28.dp else 20.dp)
     BasicTextField(
@@ -397,7 +399,7 @@ fun UnloopTextField(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = if (singleLine) 56.dp else 120.dp)
-            .background(UnloopColors.Surface, shape)
+            .background(container, shape)
             .border(1.dp, UnloopColors.Border, shape),
         decorationBox = { inner ->
             Box(

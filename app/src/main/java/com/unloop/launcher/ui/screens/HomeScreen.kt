@@ -520,69 +520,94 @@ private fun TodayPage(
             val open = state.openTasks
             SectionHeader(
                 title = stringResource(R.string.todo),
-                count = if (open.isEmpty()) null else pluralStringResource(R.plurals.tasks_left, open.size, open.size),
+                count = open.size.takeIf { it > 0 },
                 action = stringResource(R.string.see_all),
                 onAction = { onOpenTasks(false, 0L) },
             )
-            Spacer(Modifier.height(12.dp))
-            var draft by rememberSaveable { mutableStateOf("") }
-            UnloopTextField(
-                value = draft,
-                onValueChange = { draft = it },
-                hint = stringResource(R.string.add_task_hint),
-                onDone = {
+            Spacer(Modifier.height(14.dp))
+            PopCard(edge = UnloopColors.Lime) {
+                var draft by rememberSaveable { mutableStateOf("") }
+                val add = {
                     onAddTask(draft)
                     draft = ""
-                },
-            )
-            Spacer(Modifier.height(6.dp))
-            if (open.isEmpty()) {
-                Text(stringResource(R.string.nothing_to_do), color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, modifier = Modifier.padding(vertical = 12.dp))
-            }
-            open.take(5).forEach { task ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { onOpenTasks(false, 0L) }
-                        .padding(vertical = 11.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TaskCheck(done = false, onClick = { onToggleTask(task.id) }, size = 24)
-                    Spacer(Modifier.width(14.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(task.title, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        if (task.note.isNotBlank()) {
-                            Text(task.note, color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    UnloopTextField(
+                        value = draft,
+                        onValueChange = { draft = it },
+                        hint = stringResource(R.string.add_task_hint),
+                        onDone = add,
+                        container = UnloopColors.Bg,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    PopButton("+", onClick = add, height = 52.dp, textSize = 28.sp, modifier = Modifier.width(56.dp))
+                }
+                if (open.isEmpty()) {
+                    Text(
+                        stringResource(R.string.nothing_to_do),
+                        color = UnloopColors.Muted,
+                        fontFamily = Display,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+                    )
+                } else {
+                    Spacer(Modifier.height(8.dp))
+                }
+                open.take(5).forEachIndexed { i, task ->
+                    if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(UnloopColors.Divider))
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { onOpenTasks(false, 0L) }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TaskCheck(done = false, onClick = { onToggleTask(task.id) }, size = 26)
+                        Spacer(Modifier.width(14.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(task.title, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            if (task.note.isNotBlank()) {
+                                Text(task.note, color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
                         }
                     }
                 }
-            }
-            if (open.size > 5) {
-                Label(
-                    stringResource(R.string.more_tasks, open.size - 5),
-                    color = UnloopColors.Lime,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable { onOpenTasks(false, 0L) }
-                        .padding(vertical = 8.dp),
-                )
+                if (open.size > 5) {
+                    Label(
+                        stringResource(R.string.more_tasks, open.size - 5),
+                        color = UnloopColors.Lime,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable { onOpenTasks(false, 0L) }
+                            .padding(top = 6.dp),
+                    )
+                }
             }
 
             Spacer(Modifier.height(32.dp))
             SectionHeader(
                 title = stringResource(R.string.notes_tab),
-                count = if (state.notes.isEmpty()) null else state.notes.size.toString(),
+                count = state.notes.count { it.text.isNotBlank() }.takeIf { it > 0 },
                 action = stringResource(R.string.new_short),
                 onAction = onNewNote,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(14.dp))
             val notes = state.notes.filter { it.text.isNotBlank() }.sortedByDescending { it.updatedAt }
             if (notes.isEmpty()) {
                 Text(stringResource(R.string.no_notes), color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }
-            notes.take(4).chunked(2).forEach { pair ->
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(bottom = 12.dp)) {
-                    pair.forEach { note -> NoteTile(note, Modifier.weight(1f)) { onOpenTasks(true, note.id) } }
+            notes.take(4).chunked(2).forEachIndexed { row, pair ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .padding(bottom = 14.dp)
+                        .height(IntrinsicSize.Max),
+                ) {
+                    pair.forEachIndexed { col, note ->
+                        NoteTile(note, noteEdges[(row * 2 + col) % noteEdges.size], Modifier.weight(1f)) { onOpenTasks(true, note.id) }
+                    }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
@@ -617,43 +642,57 @@ private fun StatTile(edge: Color, onClick: () -> Unit, modifier: Modifier = Modi
     )
 }
 
+/** NeoPOP edge colours that note cards cycle through. */
+private val noteEdges = listOf(UnloopColors.Lime, UnloopColors.Orange, UnloopColors.Paper)
+
+/** Bold section title with a lime count pill and a small pop button for the action. */
 @Composable
-private fun SectionHeader(title: String, count: String?, action: String, onAction: () -> Unit) {
+private fun SectionHeader(title: String, count: Int?, action: String, onAction: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Label(title, color = UnloopColors.Text, size = 12.sp)
+        Text(title, fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 28.sp, letterSpacing = tracking(title, (-1).sp))
         if (count != null) {
             Spacer(Modifier.width(10.dp))
-            Label(count, color = UnloopColors.Muted, size = 11.sp)
+            Box(
+                Modifier
+                    .clip(CircleShape)
+                    .background(UnloopColors.Lime)
+                    .padding(horizontal = 10.dp, vertical = 3.dp),
+            ) {
+                Text("$count", color = UnloopColors.Ink, fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            }
         }
         Spacer(Modifier.weight(1f))
-        Label(
+        PopButton(
             action,
-            color = UnloopColors.Lime,
-            modifier = Modifier
-                .clip(CircleShape)
-                .clickable(onClick = onAction)
-                .padding(horizontal = 4.dp, vertical = 6.dp),
+            onClick = onAction,
+            face = UnloopColors.Paper,
+            edge = UnloopColors.PaperEdge,
+            height = 38.dp,
+            modifier = Modifier.width(104.dp),
         )
     }
 }
 
 @Composable
-private fun NoteTile(note: Note, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun NoteTile(note: Note, edge: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val lines = note.text.trim().lines()
-    Column(
-        modifier
-            .heightIn(min = 116.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .background(UnloopColors.Surface)
-            .border(1.dp, UnloopColors.Border, RoundedCornerShape(20.dp))
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+    PopCard(
+        edge = edge,
+        fillHeight = true,
+        modifier = modifier
+            .fillMaxHeight()
+            .heightIn(min = 124.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            ),
     ) {
-        Text(lines.first(), fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(lines.first(), fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         val rest = lines.drop(1).joinToString(" ").trim()
         if (rest.isNotEmpty()) {
-            Spacer(Modifier.height(4.dp))
-            Text(rest, color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, lineHeight = 18.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(6.dp))
+            Text(rest, color = UnloopColors.TextSoft, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, lineHeight = 18.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
         }
     }
 }

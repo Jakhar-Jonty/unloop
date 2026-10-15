@@ -55,6 +55,7 @@ fun PopButton(
     edge: Color = UnloopColors.LimeEdge,
     textColor: Color = UnloopColors.Ink,
     height: Dp = 56.dp,
+    textSize: TextUnit = 17.sp,
 ) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
@@ -85,7 +86,7 @@ fun PopButton(
                 },
             contentAlignment = Alignment.Center,
         ) {
-            Text(text, color = textColor, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+            Text(text, color = textColor, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = textSize)
         }
     }
 }
