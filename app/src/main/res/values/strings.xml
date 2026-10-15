@@ -339,7 +339,7 @@
     <string name="no_notes">No notes yet.</string>
     <string name="empty_note">Empty note</string>
     <string name="show_tasks">To-do on home</string>
-    <string name="show_tasks_hint">Your open tasks on the Today page (swipe left on home). Tap the card for the full list and notes.</string>
+    <string name="show_tasks_hint">To-do and notes on the Today page (swipe left on home).</string>
     <string name="just_now">Just now</string>
     <string name="today">Today</string>
     <string name="see_all">See all</string>

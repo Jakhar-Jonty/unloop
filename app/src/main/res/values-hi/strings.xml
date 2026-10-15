@@ -337,7 +337,7 @@
     <string name="no_notes">अभी कोई नोट नहीं।</string>
     <string name="empty_note">खाली नोट</string>
     <string name="show_tasks">होम पर करने के काम</string>
-    <string name="show_tasks_hint">"आज" पेज पर आपके बाकी काम (होम पर बाएँ स्वाइप करें)। पूरी सूची और नोट्स के लिए कार्ड दबाएं।</string>
+    <string name="show_tasks_hint">"आज" पेज पर करने के काम और नोट्स (होम पर बाएँ स्वाइप करें)।</string>
     <string name="just_now">अभी-अभी</string>
     <string name="today">आज</string>
     <string name="see_all">सभी देखें</string>

@@ -1,5 +1,21 @@
 package com.unloop.launcher.ui.screens
 
+import kotlinx.coroutines.delay
+import com.unloop.launcher.data.Task
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.key
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.animateColorAsState
 import com.unloop.launcher.data.Note
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.border
@@ -112,23 +128,25 @@ fun HomeScreen(
     onPlant: () -> Unit,
     onNotifications: () -> Unit,
     onLock: () -> Unit,
-    onOpenTasks: (notes: Boolean, noteId: Long) -> Unit,
-    onToggleTask: (Long) -> Unit,
-    onAddTask: (String) -> Unit,
-    onNewNote: () -> Unit,
+    taskActions: TaskActions,
+    onOpenNote: (Long) -> Unit,
     onGrantUsage: () -> Unit,
     onSetDefault: () -> Unit,
     onMinuteTick: () -> Unit,
     homePresses: Int,
+    /** Page to open on (1 = Today), so returning from a note lands back on Today. */
+    startPage: Int = 0,
+    onPageChange: (Int) -> Unit = {},
 ) {
     // Home is the bottom of the stack: back does nothing (no "leave app" slide).
     BackHandler {}
     val now by rememberMinuteClock()
     LaunchedEffect(now) { onMinuteTick() }
-    val pager = rememberPagerState { 2 }
+    val pager = rememberPagerState(initialPage = startPage) { 2 }
+    LaunchedEffect(pager.currentPage) { onPageChange(pager.currentPage) }
     val scope = rememberCoroutineScope()
-    // Home button always lands on the main page.
-    LaunchedEffect(homePresses) { pager.scrollToPage(0) }
+    // The caller owns which page is showing (Home press resets it to 0); follow it.
+    LaunchedEffect(startPage) { if (pager.currentPage != startPage) pager.scrollToPage(startPage) }
 
     Box(
         Modifier
@@ -158,10 +176,8 @@ fun HomeScreen(
                     state = state,
                     onWeek = onWeek,
                     onPlant = onPlant,
-                    onOpenTasks = onOpenTasks,
-                    onToggleTask = onToggleTask,
-                    onAddTask = onAddTask,
-                    onNewNote = onNewNote,
+                    actions = taskActions,
+                    onOpenNote = onOpenNote,
                     onGrantUsage = onGrantUsage,
                 )
             }
@@ -403,18 +419,18 @@ private fun MainPage(
     }
 }
 
-/** Page 2: today at a glance. Two small stat tiles, then to-do and notes. */
+/** Page 2: today at a glance. Two small stat tiles, then to-do and notes, all in place. */
 @Composable
 private fun TodayPage(
     state: UiState,
     onWeek: () -> Unit,
     onPlant: () -> Unit,
-    onOpenTasks: (notes: Boolean, noteId: Long) -> Unit,
-    onToggleTask: (Long) -> Unit,
-    onAddTask: (String) -> Unit,
-    onNewNote: () -> Unit,
+    actions: TaskActions,
+    onOpenNote: (Long) -> Unit,
     onGrantUsage: () -> Unit,
 ) {
+    var editingTask by remember { mutableStateOf<Task?>(null) }
+    var showDone by rememberSaveable { mutableStateOf(false) }
     Column(
         Modifier
             .fillMaxSize()
@@ -516,19 +532,15 @@ private fun TodayPage(
         }
 
         if (state.showTasks) {
-            Spacer(Modifier.height(32.dp))
+            // To-do: add in place, check off with a small animation, tap a task to edit it.
+            Spacer(Modifier.height(36.dp))
             val open = state.openTasks
-            SectionHeader(
-                title = stringResource(R.string.todo),
-                count = open.size.takeIf { it > 0 },
-                action = stringResource(R.string.see_all),
-                onAction = { onOpenTasks(false, 0L) },
-            )
-            Spacer(Modifier.height(14.dp))
-            PopCard(edge = UnloopColors.Lime) {
+            SectionHeader(stringResource(R.string.todo), count = open.size.takeIf { it > 0 })
+            Spacer(Modifier.height(12.dp))
+            PopCard(edge = UnloopColors.LimeEdge) {
                 var draft by rememberSaveable { mutableStateOf("") }
                 val add = {
-                    onAddTask(draft)
+                    actions.add(draft)
                     draft = ""
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -541,7 +553,7 @@ private fun TodayPage(
                         modifier = Modifier.weight(1f),
                     )
                     Spacer(Modifier.width(10.dp))
-                    PopButton("+", onClick = add, height = 52.dp, textSize = 28.sp, modifier = Modifier.width(56.dp))
+                    PopButton("+", onClick = add, height = 48.dp, textSize = 26.sp, modifier = Modifier.width(52.dp))
                 }
                 if (open.isEmpty()) {
                     Text(
@@ -550,79 +562,141 @@ private fun TodayPage(
                         fontFamily = Display,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 15.sp,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+                        modifier = Modifier.padding(top = 14.dp, bottom = 2.dp),
                     )
                 } else {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                 }
-                open.take(5).forEachIndexed { i, task ->
-                    if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(UnloopColors.Divider))
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable { onOpenTasks(false, 0L) }
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        TaskCheck(done = false, onClick = { onToggleTask(task.id) }, size = 26)
-                        Spacer(Modifier.width(14.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(task.title, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            if (task.note.isNotBlank()) {
-                                Text(task.note, color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                open.forEach { task ->
+                    key(task.id) {
+                        TaskLine(task, onToggle = { actions.toggle(task.id) }, onOpen = { editingTask = task })
+                    }
+                }
+                val done = state.doneTasks
+                if (done.isNotEmpty()) {
+                    Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Label(
+                            "${stringResource(R.string.done_section)} · ${done.size}  " + if (showDone) "▲" else "▼",
+                            color = UnloopColors.Muted,
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { showDone = !showDone }
+                                .padding(vertical = 6.dp),
+                        )
+                        Label(
+                            stringResource(R.string.clear_done),
+                            color = UnloopColors.Orange,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .clickable(onClick = actions.clearDone)
+                                .padding(6.dp),
+                        )
+                    }
+                    AnimatedVisibility(visible = showDone, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+                        Column {
+                            done.forEach { task ->
+                                key(task.id) {
+                                    TaskLine(task, onToggle = { actions.toggle(task.id) }, onOpen = { editingTask = task })
+                                }
                             }
                         }
                     }
                 }
-                if (open.size > 5) {
-                    Label(
-                        stringResource(R.string.more_tasks, open.size - 5),
-                        color = UnloopColors.Lime,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .clickable { onOpenTasks(false, 0L) }
-                            .padding(top = 6.dp),
-                    )
-                }
             }
 
-            Spacer(Modifier.height(32.dp))
-            SectionHeader(
-                title = stringResource(R.string.notes_tab),
-                count = state.notes.count { it.text.isNotBlank() }.takeIf { it > 0 },
-                action = stringResource(R.string.new_short),
-                onAction = onNewNote,
-            )
-            Spacer(Modifier.height(14.dp))
+            // Notes: a quiet grid; tapping one opens it straight away.
+            Spacer(Modifier.height(36.dp))
             val notes = state.notes.filter { it.text.isNotBlank() }.sortedByDescending { it.updatedAt }
+            SectionHeader(
+                stringResource(R.string.notes_tab),
+                count = notes.size.takeIf { it > 0 },
+                action = stringResource(R.string.new_short),
+                onAction = { onOpenNote(actions.newNote()) },
+            )
+            Spacer(Modifier.height(12.dp))
             if (notes.isEmpty()) {
                 Text(stringResource(R.string.no_notes), color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }
-            notes.take(4).chunked(2).forEachIndexed { row, pair ->
+            notes.chunked(2).forEach { pair ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
-                        .padding(bottom = 14.dp)
+                        .padding(bottom = 12.dp)
                         .height(IntrinsicSize.Max),
                 ) {
-                    pair.forEachIndexed { col, note ->
-                        NoteTile(note, noteEdges[(row * 2 + col) % noteEdges.size], Modifier.weight(1f)) { onOpenTasks(true, note.id) }
-                    }
+                    pair.forEach { note -> key(note.id) { NoteTile(note, Modifier.weight(1f)) { onOpenNote(note.id) } } }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
-            if (notes.size > 4) {
-                Label(
-                    stringResource(R.string.see_all),
-                    color = UnloopColors.Lime,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable { onOpenTasks(true, 0L) }
-                        .padding(vertical = 8.dp),
-                )
-            }
         }
         Spacer(Modifier.height(56.dp))
+    }
+
+    editingTask?.let { task ->
+        TaskSheet(
+            task = task,
+            onDismiss = { editingTask = null },
+            onSave = { title, note ->
+                actions.update(task.id, title, note)
+                editingTask = null
+            },
+            onDelete = {
+                actions.delete(task.id)
+                editingTask = null
+            },
+        )
+    }
+}
+
+/**
+ * One task. Checking an open task fills the circle, strikes the title, then the row folds away
+ * before the task moves to Done. New tasks slide in.
+ */
+@Composable
+private fun TaskLine(task: Task, onToggle: () -> Unit, onOpen: () -> Unit) {
+    var checking by remember(task.id) { mutableStateOf(false) }
+    val isNew = remember(task.id) { System.currentTimeMillis() - task.createdAt < 2_000 }
+    val visible = remember(task.id) { MutableTransitionState(!isNew).apply { targetState = true } }
+    LaunchedEffect(checking) {
+        if (checking) {
+            delay(420)
+            visible.targetState = false
+            delay(260)
+            onToggle()
+        }
+    }
+    val done = task.done || checking
+    val titleColor by animateColorAsState(if (done) UnloopColors.Muted else UnloopColors.Text, tween(250), label = "title")
+    AnimatedVisibility(
+        visibleState = visible,
+        enter = expandVertically(tween(260)) + fadeIn(tween(260)),
+        exit = shrinkVertically(tween(260)) + fadeOut(tween(200)),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onOpen)
+                .padding(vertical = 11.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TaskCheck(done = done, onClick = { if (task.done) onToggle() else checking = true }, size = 26)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    task.title,
+                    color = titleColor,
+                    fontFamily = Display,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    textDecoration = if (done) TextDecoration.LineThrough else null,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (task.note.isNotBlank()) {
+                    Text(task.note, color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+            }
+        }
     }
 }
 
@@ -642,51 +716,46 @@ private fun StatTile(edge: Color, onClick: () -> Unit, modifier: Modifier = Modi
     )
 }
 
-/** NeoPOP edge colours that note cards cycle through. */
-private val noteEdges = listOf(UnloopColors.Lime, UnloopColors.Orange, UnloopColors.Paper)
-
-/** Bold section title with a lime count pill and a small pop button for the action. */
+/** Quiet section title with a grey count and an optional small lime action. */
 @Composable
-private fun SectionHeader(title: String, count: Int?, action: String, onAction: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(title, fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 28.sp, letterSpacing = tracking(title, (-1).sp))
+private fun SectionHeader(title: String, count: Int?, action: String? = null, onAction: () -> Unit = {}) {
+    Row(verticalAlignment = Alignment.Bottom) {
+        Text(title, fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, letterSpacing = tracking(title, (-0.5).sp))
         if (count != null) {
-            Spacer(Modifier.width(10.dp))
-            Box(
-                Modifier
-                    .clip(CircleShape)
-                    .background(UnloopColors.Lime)
-                    .padding(horizontal = 10.dp, vertical = 3.dp),
-            ) {
-                Text("$count", color = UnloopColors.Ink, fontFamily = Mono, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            }
+            Spacer(Modifier.width(8.dp))
+            Text("$count", color = UnloopColors.Muted, fontFamily = Mono, fontSize = 14.sp, modifier = Modifier.padding(bottom = 3.dp))
         }
         Spacer(Modifier.weight(1f))
-        PopButton(
-            action,
-            onClick = onAction,
-            face = UnloopColors.Paper,
-            edge = UnloopColors.PaperEdge,
-            height = 38.dp,
-            modifier = Modifier.width(104.dp),
-        )
+        if (action != null) {
+            Label(
+                action,
+                color = UnloopColors.Lime,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable(onClick = onAction)
+                    .padding(horizontal = 6.dp, vertical = 6.dp),
+            )
+        }
     }
 }
 
+/** Note preview card. Presses down slightly when tapped. */
 @Composable
-private fun NoteTile(note: Note, edge: Color, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun NoteTile(note: Note, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val lines = note.text.trim().lines()
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale by animateFloatAsState(if (pressed) 0.96f else 1f, spring(stiffness = Spring.StiffnessMedium), label = "press")
     PopCard(
-        edge = edge,
         fillHeight = true,
         modifier = modifier
             .fillMaxHeight()
-            .heightIn(min = 124.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick,
-            ),
+            .heightIn(min = 112.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clickable(interactionSource = interaction, indication = null, onClick = onClick),
     ) {
         Text(lines.first(), fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         val rest = lines.drop(1).joinToString(" ").trim()

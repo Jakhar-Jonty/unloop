@@ -1,5 +1,12 @@
 package com.unloop.launcher
 
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.AnimatedContent
 import com.unloop.launcher.ui.components.MAX_LEAVES
 import com.unloop.launcher.ui.components.LEAF_MINUTES
 import com.unloop.launcher.ui.components.FLOWER_DAYS
@@ -31,7 +38,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -69,7 +75,7 @@ import com.unloop.launcher.ui.screens.PauseScreen
 import com.unloop.launcher.ui.screens.ReflectionScreen
 import com.unloop.launcher.ui.screens.SettingsScreen
 import com.unloop.launcher.ui.screens.TaskActions
-import com.unloop.launcher.ui.screens.TasksScreen
+import com.unloop.launcher.ui.screens.NoteEditor
 import com.unloop.launcher.ui.screens.StartFocusSheet
 import com.unloop.launcher.ui.screens.UnloopSheet
 import com.unloop.launcher.ui.theme.Display
@@ -86,7 +92,7 @@ private sealed interface Screen {
     data object AllApps : Screen
     data object Settings : Screen
     data object Reflection : Screen
-    data class Tasks(val notes: Boolean = false, val noteId: Long = 0L) : Screen
+    data class Note(val id: Long) : Screen
     data class Pause(val app: AppInfo, val gate: Gate) : Screen
 }
 
@@ -142,6 +148,8 @@ class MainActivity : ComponentActivity() {
         var sheetApp by remember { mutableStateOf<AppInfo?>(null) }
         var focusSheet by remember { mutableStateOf<FocusSheet?>(null) }
         var plantSheet by remember { mutableStateOf(false) }
+        // Which home page was showing, so coming back from a note lands on Today again.
+        var homePage by rememberSaveable { mutableIntStateOf(0) }
         var limitApp by remember { mutableStateOf<AppInfo?>(null) }
         val taskActions = remember {
             TaskActions(
@@ -160,6 +168,7 @@ class MainActivity : ComponentActivity() {
 
         LaunchedEffect(homePresses) {
             screen = Screen.Home
+            homePage = 0
             sheetApp = null
             focusSheet = null
             plantSheet = false
@@ -189,7 +198,18 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        Crossfade(targetState = screen, animationSpec = tween(220), label = "screen") { current ->
+        AnimatedContent(
+            targetState = screen,
+            transitionSpec = {
+                if (targetState is Screen.Note) {
+                    (slideInVertically(tween(280)) { it / 8 } + fadeIn(tween(220))) togetherWith fadeOut(tween(150))
+                } else {
+                    (fadeIn(tween(220)) + scaleIn(tween(220), initialScale = 0.98f)) togetherWith fadeOut(tween(150))
+                }
+            },
+            contentKey = { it::class },
+            label = "screen",
+        ) { current ->
             when (current) {
                 Screen.Home -> HomeScreen(
                     state = state,
@@ -205,10 +225,10 @@ class MainActivity : ComponentActivity() {
                     },
                     onPlant = { plantSheet = true },
                     onNotifications = ::expandNotifications,
-                    onOpenTasks = { notes, noteId -> screen = Screen.Tasks(notes, noteId) },
-                    onToggleTask = vm::toggleTask,
-                    onAddTask = vm::addTask,
-                    onNewNote = { screen = Screen.Tasks(notes = true, noteId = vm.newNote()) },
+                    taskActions = taskActions,
+                    onOpenNote = { screen = Screen.Note(it) },
+                    startPage = homePage,
+                    onPageChange = { homePage = it },
                     onLock = {
                         if (UnloopAccessibilityService.instance?.lockScreen() != true) {
                             toast(getString(R.string.lock_needs_accessibility))
@@ -226,13 +246,25 @@ class MainActivity : ComponentActivity() {
                     onBack = { screen = Screen.Home },
                     onSettings = { screen = Screen.Settings },
                 )
-                is Screen.Tasks -> TasksScreen(
-                    state = state,
-                    actions = taskActions,
-                    onBack = { screen = Screen.Home },
-                    initialNotes = current.notes,
-                    initialNoteId = current.noteId,
-                )
+                is Screen.Note -> {
+                    val note = state.notes.firstOrNull { it.id == current.id }
+                    if (note == null) {
+                        LaunchedEffect(Unit) { screen = Screen.Home }
+                    } else {
+                        NoteEditor(
+                            note = note,
+                            onChange = { vm.updateNote(note.id, it) },
+                            onDelete = {
+                                vm.deleteNote(note.id)
+                                screen = Screen.Home
+                            },
+                            onClose = {
+                                vm.dropEmptyNotes()
+                                screen = Screen.Home
+                            },
+                        )
+                    }
+                }
                 Screen.Reflection -> ReflectionScreen(
                     state = state,
                     onBack = { screen = Screen.Home },
