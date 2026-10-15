@@ -62,7 +62,7 @@
     <string name="unloop_settings">Unloop settings  →</string>
     <string name="show_hidden">Show hidden apps (%d)</string>
     <string name="collapse_hidden">Collapse hidden apps</string>
-    <string name="pause_badge">5s pause</string>
+    <string name="pause_badge">Pause</string>
 
     <!-- Pause screen -->
     <string name="about_to_open">You\'re about to open</string>
@@ -95,7 +95,7 @@
     <!-- App actions -->
     <string name="add_to_home">Add to home</string>
     <string name="remove_from_home">Remove from home</string>
-    <string name="pause_5s">5-second pause</string>
+    <string name="pause_5s">Pause before opening</string>
     <string name="state_on">On</string>
     <string name="state_off">Off</string>
     <string name="allowed_in_focus">Allowed in Focus mode</string>
@@ -127,7 +127,7 @@
 
     <!-- Settings -->
     <string name="settings">Settings</string>
-    <string name="daily_limit">Daily screen-time limit</string>
+    <string name="daily_limit">Daily phone limit</string>
     <string name="focus_apps_hint">Focus mode and all schedules show only these apps on home.</string>
     <string name="paused_hint">Tap to remove the pause.</string>
     <string name="hidden_apps">Hidden apps</string>
@@ -239,10 +239,10 @@
     <string name="limit_reached_body">You\'ve used %1$s for %2$s today. Your limit is %3$s.</string>
     <string name="five_more_minutes">5 more minutes</string>
     <string name="five_more_minutes_in">5 more minutes in %ds</string>
-    <string name="daily_limit_app">Daily limit</string>
-    <string name="daily_limit_for">Daily limit for %s</string>
+    <string name="daily_limit_app">Time limit</string>
+    <string name="daily_limit_for">Time limit for %s</string>
     <string name="daily_limit_sheet_body">When the time is used up, a block screen appears for the rest of the day.</string>
-    <string name="app_limits">Daily app limits</string>
+    <string name="app_limits">App time limits</string>
     <string name="app_limits_hint">After this much time in a day, the app is blocked.</string>
     <string name="pause_everywhere">Pause everywhere</string>
     <string name="pause_everywhere_hint">Also pause apps opened from notifications, Recents or links. Turn on “Unloop: pause everywhere” in Accessibility.</string>
@@ -305,13 +305,13 @@
     <string name="strict_short_on">Strict mode on</string>
     <string name="dnd_access">Do Not Disturb access</string>
     <string name="calendar_access">Calendar</string>
-    <string name="paused_apps">Paused apps</string>
+    <string name="paused_apps">Apps with a pause</string>
     <string name="paused_apps_hint">These apps get the breathing pause before they open.</string>
     <string name="optional">Optional</string>
     <string name="add_app">+  Add app</string>
     <string name="done">Done</string>
     <string name="lock_wallpaper">Lock screen wallpaper</string>
-    <string name="lock_wallpaper_hint">Shows today\'s screen time, your plant and a quote on the lock screen. Turning it off brings back the phone\'s default lock wallpaper.</string>
+    <string name="lock_wallpaper_hint">Shows today\'s screen time on your lock screen. Full layout adds your plant and a quote. Turning it off brings back the phone\'s default lock wallpaper.</string>
     <string name="lock_layout">Layout</string>
     <string name="lock_compact">Compact</string>
     <string name="lock_full">Full</string>
@@ -331,14 +331,14 @@
     <string name="add_short">+ Add</string>
     <string name="nothing_to_do">Nothing on your list. Enjoy it.</string>
     <string name="done_section">Done</string>
-    <string name="clear_done">Clear done</string>
+    <string name="clear_done">Clear finished</string>
     <string name="task_note_hint">Add a note…</string>
     <string name="delete">Delete</string>
     <string name="new_note">+ New note</string>
     <string name="note_hint">Write something…</string>
     <string name="no_notes">No notes yet.</string>
     <string name="empty_note">Empty note</string>
-    <string name="show_tasks">To-do on home</string>
+    <string name="show_tasks">To-do &amp; notes on Today</string>
     <string name="show_tasks_hint">To-do and notes on the Today page (swipe left on home).</string>
     <string name="just_now">Just now</string>
     <string name="today">Today</string>

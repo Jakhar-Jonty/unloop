@@ -60,7 +60,7 @@
     <string name="unloop_settings">Unloop सेटिंग्स  →</string>
     <string name="show_hidden">छिपे हुए ऐप्स दिखाएं (%d)</string>
     <string name="collapse_hidden">छिपे हुए ऐप्स बंद करें</string>
-    <string name="pause_badge">5 से. रुकें</string>
+    <string name="pause_badge">ठहराव</string>
 
     <!-- Pause screen -->
     <string name="about_to_open">आप खोलने जा रहे हैं</string>
@@ -93,7 +93,7 @@
     <!-- App actions -->
     <string name="add_to_home">होम पर जोड़ें</string>
     <string name="remove_from_home">होम से हटाएं</string>
-    <string name="pause_5s">5 सेकंड का ठहराव</string>
+    <string name="pause_5s">खोलने से पहले ठहराव</string>
     <string name="state_on">चालू</string>
     <string name="state_off">बंद</string>
     <string name="allowed_in_focus">फ़ोकस मोड में चलेगा</string>
@@ -125,7 +125,7 @@
 
     <!-- Settings -->
     <string name="settings">सेटिंग्स</string>
-    <string name="daily_limit">रोज़ की स्क्रीन टाइम सीमा</string>
+    <string name="daily_limit">फ़ोन की रोज़ की सीमा</string>
     <string name="focus_apps_hint">फ़ोकस मोड और सभी समय-सारणी में होम पर सिर्फ़ ये ऐप्स दिखेंगे।</string>
     <string name="paused_hint">ठहराव हटाने के लिए दबाएं।</string>
     <string name="hidden_apps">छिपे हुए ऐप्स</string>
@@ -237,10 +237,10 @@
     <string name="limit_reached_body">आज आपने %1$s पर %2$s बिताए। आपकी सीमा %3$s है।</string>
     <string name="five_more_minutes">5 मिनट और</string>
     <string name="five_more_minutes_in">%d से. में 5 मिनट और</string>
-    <string name="daily_limit_app">रोज़ की सीमा</string>
-    <string name="daily_limit_for">%s की रोज़ की सीमा</string>
+    <string name="daily_limit_app">समय-सीमा</string>
+    <string name="daily_limit_for">%s की समय-सीमा</string>
     <string name="daily_limit_sheet_body">समय पूरा होने पर बाकी दिन के लिए रोकने वाली स्क्रीन दिखेगी।</string>
-    <string name="app_limits">ऐप्स की रोज़ की सीमा</string>
+    <string name="app_limits">ऐप्स की समय-सीमा</string>
     <string name="app_limits_hint">दिन में इतना समय होने के बाद ऐप रुक जाएगा।</string>
     <string name="pause_everywhere">हर जगह ठहराव</string>
     <string name="pause_everywhere_hint">नोटिफ़िकेशन, हाल के ऐप्स या लिंक से खुले ऐप्स पर भी ठहराव। Accessibility में “Unloop: हर जगह ठहराव” चालू करें।</string>
@@ -309,7 +309,7 @@
     <string name="add_app">+  ऐप जोड़ें</string>
     <string name="done">हो गया</string>
     <string name="lock_wallpaper">लॉक स्क्रीन वॉलपेपर</string>
-    <string name="lock_wallpaper_hint">लॉक स्क्रीन पर आज का स्क्रीन टाइम, आपका पौधा और एक विचार दिखाता है। बंद करने पर फ़ोन का डिफ़ॉल्ट लॉक वॉलपेपर वापस आ जाएगा।</string>
+    <string name="lock_wallpaper_hint">लॉक स्क्रीन पर आज का स्क्रीन टाइम दिखाता है। पूरे लेआउट में आपका पौधा और एक विचार भी। बंद करने पर फ़ोन का डिफ़ॉल्ट लॉक वॉलपेपर वापस आ जाएगा।</string>
     <string name="lock_layout">लेआउट</string>
     <string name="lock_compact">छोटा</string>
     <string name="lock_full">पूरा</string>
@@ -329,14 +329,14 @@
     <string name="add_short">+ जोड़ें</string>
     <string name="nothing_to_do">सूची खाली है। आराम कीजिए।</string>
     <string name="done_section">हो गए</string>
-    <string name="clear_done">हो गए हटाएं</string>
+    <string name="clear_done">पूरे हुए हटाएं</string>
     <string name="task_note_hint">नोट जोड़ें…</string>
     <string name="delete">हटाएं</string>
     <string name="new_note">+ नया नोट</string>
     <string name="note_hint">कुछ लिखें…</string>
     <string name="no_notes">अभी कोई नोट नहीं।</string>
     <string name="empty_note">खाली नोट</string>
-    <string name="show_tasks">होम पर करने के काम</string>
+    <string name="show_tasks">"आज" पर करने के काम और नोट्स</string>
     <string name="show_tasks_hint">"आज" पेज पर करने के काम और नोट्स (होम पर बाएँ स्वाइप करें)।</string>
     <string name="just_now">अभी-अभी</string>
     <string name="today">आज</string>
