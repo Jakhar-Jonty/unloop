@@ -1,5 +1,6 @@
 package com.unloop.launcher.ui.screens
 
+import androidx.compose.ui.graphics.Brush
 import kotlinx.coroutines.delay
 import com.unloop.launcher.data.Task
 import androidx.compose.ui.text.style.TextDecoration
@@ -182,6 +183,14 @@ fun HomeScreen(
                 )
             }
         }
+        // Soft fade so scrolling content never collides with the page dots.
+        Box(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height(72.dp)
+                .background(Brush.verticalGradient(listOf(Color.Transparent, UnloopColors.Bg))),
+        )
         PageDots(
             current = pager.currentPage,
             modifier = Modifier
@@ -431,6 +440,8 @@ private fun TodayPage(
 ) {
     var editingTask by remember { mutableStateOf<Task?>(null) }
     var showDone by rememberSaveable { mutableStateOf(false) }
+    var showAll by rememberSaveable { mutableStateOf(false) }
+    var showAllNotes by rememberSaveable { mutableStateOf(false) }
     Column(
         Modifier
             .fillMaxSize()
@@ -439,17 +450,21 @@ private fun TodayPage(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 28.dp),
     ) {
-        Spacer(Modifier.height(36.dp))
+        Spacer(Modifier.height(28.dp))
         val title = stringResource(R.string.today)
-        Text(title, fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 44.sp, letterSpacing = tracking(title, (-1.5).sp))
-        Text(
-            SimpleDateFormat("EEEE, d MMMM", Locale.getDefault()).format(Date()),
-            color = UnloopColors.TextSoft,
-            fontFamily = Display,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
-        )
-        Spacer(Modifier.height(22.dp))
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(title, fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 34.sp, letterSpacing = tracking(title, (-1).sp))
+            Spacer(Modifier.width(12.dp))
+            Text(
+                SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(Date()),
+                color = UnloopColors.Muted,
+                fontFamily = Display,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                modifier = Modifier.padding(bottom = 5.dp),
+            )
+        }
+        Spacer(Modifier.height(18.dp))
 
         val usage = state.usage
         if (state.hasUsageAccess && usage != null) {
@@ -505,7 +520,7 @@ private fun TodayPage(
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
-                        Plant(leaves = leaves, flowering = state.flowering, modifier = Modifier.size(width = 34.dp, height = 48.dp))
+                        Plant(leaves = leaves, flowering = state.flowering, modifier = Modifier.size(width = 48.dp, height = 64.dp))
                     }
                 }
             }
@@ -533,7 +548,7 @@ private fun TodayPage(
 
         if (state.showTasks) {
             // To-do: add in place, check off with a small animation, tap a task to edit it.
-            Spacer(Modifier.height(36.dp))
+            Spacer(Modifier.height(28.dp))
             val open = state.openTasks
             SectionHeader(stringResource(R.string.todo), count = open.size.takeIf { it > 0 })
             Spacer(Modifier.height(12.dp))
@@ -567,14 +582,33 @@ private fun TodayPage(
                 } else {
                     Spacer(Modifier.height(6.dp))
                 }
-                open.forEach { task ->
+                open.take(TASKS_SHOWN).forEach { task ->
                     key(task.id) {
                         TaskLine(task, onToggle = { actions.toggle(task.id) }, onOpen = { editingTask = task })
                     }
                 }
+                if (open.size > TASKS_SHOWN) {
+                    AnimatedVisibility(visible = showAll, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+                        Column {
+                            open.drop(TASKS_SHOWN).forEach { task ->
+                                key(task.id) {
+                                    TaskLine(task, onToggle = { actions.toggle(task.id) }, onOpen = { editingTask = task })
+                                }
+                            }
+                        }
+                    }
+                    Label(
+                        if (showAll) stringResource(R.string.show_less) + "  ▲" else stringResource(R.string.show_all_tasks, open.size) + "  ▼",
+                        color = UnloopColors.Lime,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showAll = !showAll }
+                            .padding(top = 8.dp, bottom = 2.dp),
+                    )
+                }
                 val done = state.doneTasks
                 if (done.isNotEmpty()) {
-                    Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Label(
                             "${stringResource(R.string.done_section)} · ${done.size}  " + if (showDone) "▲" else "▼",
                             color = UnloopColors.Muted,
@@ -605,7 +639,7 @@ private fun TodayPage(
             }
 
             // Notes: a quiet grid; tapping one opens it straight away.
-            Spacer(Modifier.height(36.dp))
+            Spacer(Modifier.height(28.dp))
             val notes = state.notes.filter { it.text.isNotBlank() }.sortedByDescending { it.updatedAt }
             SectionHeader(
                 stringResource(R.string.notes_tab),
@@ -617,7 +651,8 @@ private fun TodayPage(
             if (notes.isEmpty()) {
                 Text(stringResource(R.string.no_notes), color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }
-            notes.chunked(2).forEach { pair ->
+            @Composable
+            fun NoteRows(list: List<Note>) = list.chunked(2).forEach { pair ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
@@ -627,6 +662,20 @@ private fun TodayPage(
                     pair.forEach { note -> key(note.id) { NoteTile(note, Modifier.weight(1f)) { onOpenNote(note.id) } } }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
+            }
+            NoteRows(notes.take(NOTES_SHOWN))
+            if (notes.size > NOTES_SHOWN) {
+                AnimatedVisibility(visible = showAllNotes, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
+                    Column { NoteRows(notes.drop(NOTES_SHOWN)) }
+                }
+                Label(
+                    if (showAllNotes) stringResource(R.string.show_less) + "  ▲" else stringResource(R.string.show_all_tasks, notes.size) + "  ▼",
+                    color = UnloopColors.Lime,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showAllNotes = !showAllNotes }
+                        .padding(vertical = 6.dp),
+                )
             }
         }
         Spacer(Modifier.height(56.dp))
@@ -647,6 +696,12 @@ private fun TodayPage(
         )
     }
 }
+
+/** Open tasks shown before "Show all". */
+private const val TASKS_SHOWN = 5
+
+/** Notes shown before "Show all". */
+private const val NOTES_SHOWN = 4
 
 /**
  * One task. Checking an open task fills the circle, strikes the title, then the row folds away
@@ -676,10 +731,10 @@ private fun TaskLine(task: Task, onToggle: () -> Unit, onOpen: () -> Unit) {
             Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onOpen)
-                .padding(vertical = 11.dp),
+                .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TaskCheck(done = done, onClick = { if (task.done) onToggle() else checking = true }, size = 26)
+            TaskCheck(done = done, onClick = { if (task.done) onToggle() else checking = true }, size = 24)
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(
@@ -687,7 +742,7 @@ private fun TaskLine(task: Task, onToggle: () -> Unit, onOpen: () -> Unit) {
                     color = titleColor,
                     fontFamily = Display,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
+                    fontSize = 17.sp,
                     textDecoration = if (done) TextDecoration.LineThrough else null,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -750,7 +805,7 @@ private fun NoteTile(note: Note, modifier: Modifier = Modifier, onClick: () -> U
         fillHeight = true,
         modifier = modifier
             .fillMaxHeight()
-            .heightIn(min = 112.dp)
+            .heightIn(min = 76.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale

@@ -352,4 +352,6 @@
         <item quantity="one">%d day safe</item>
         <item quantity="other">%d days safe</item>
     </plurals>
+    <string name="show_all_tasks">Show all %d</string>
+    <string name="show_less">Show less</string>
 </resources>

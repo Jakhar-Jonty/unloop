@@ -350,4 +350,6 @@
         <item quantity="one">%d दिन सुरक्षित</item>
         <item quantity="other">%d दिन सुरक्षित</item>
     </plurals>
+    <string name="show_all_tasks">सभी %d दिखाएं</string>
+    <string name="show_less">कम दिखाएं</string>
 </resources>
