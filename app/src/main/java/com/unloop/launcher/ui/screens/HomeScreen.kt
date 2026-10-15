@@ -1,5 +1,9 @@
 package com.unloop.launcher.ui.screens
 
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.unit.TextUnit
@@ -20,7 +24,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -83,7 +86,6 @@ import com.unloop.launcher.ui.theme.UnloopColors
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.abs
 
 @Composable
 fun HomeScreen(
@@ -97,7 +99,6 @@ fun HomeScreen(
     onWeek: () -> Unit,
     onPlant: () -> Unit,
     onNotifications: () -> Unit,
-    onCamera: () -> Unit,
     onLock: () -> Unit,
     onOpenTasks: () -> Unit,
     onToggleTask: (Long) -> Unit,
@@ -105,46 +106,98 @@ fun HomeScreen(
     onGrantUsage: () -> Unit,
     onSetDefault: () -> Unit,
     onMinuteTick: () -> Unit,
+    homePresses: Int,
 ) {
     // Home is the bottom of the stack: back does nothing (no "leave app" slide).
     BackHandler {}
     val now by rememberMinuteClock()
     LaunchedEffect(now) { onMinuteTick() }
+    val pager = rememberPagerState { 2 }
+    // Home button always lands on the main page.
+    LaunchedEffect(homePresses) { pager.scrollToPage(0) }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(UnloopColors.Bg),
+    ) {
+        HorizontalPager(state = pager, modifier = Modifier.fillMaxSize()) { page ->
+            if (page == 0) {
+                MainPage(
+                    state = state,
+                    now = now,
+                    onOpenApp = onOpenApp,
+                    onAppActions = onAppActions,
+                    onAllApps = onAllApps,
+                    onFocusMode = onFocusMode,
+                    onEndFocus = onEndFocus,
+                    onSettings = onSettings,
+                    onNotifications = onNotifications,
+                    onLock = onLock,
+                    onSetDefault = onSetDefault,
+                )
+            } else {
+                TodayPage(
+                    state = state,
+                    onWeek = onWeek,
+                    onPlant = onPlant,
+                    onOpenTasks = onOpenTasks,
+                    onToggleTask = onToggleTask,
+                    onAddTask = onAddTask,
+                    onGrantUsage = onGrantUsage,
+                )
+            }
+        }
+        PageDots(
+            current = pager.currentPage,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 6.dp),
+        )
+    }
+}
+
+/** Page 1: clock, home apps and the two main buttons. Nothing else. */
+@Composable
+private fun MainPage(
+    state: UiState,
+    now: Long,
+    onOpenApp: (AppInfo) -> Unit,
+    onAppActions: (AppInfo) -> Unit,
+    onAllApps: () -> Unit,
+    onFocusMode: () -> Unit,
+    onEndFocus: () -> Unit,
+    onSettings: () -> Unit,
+    onNotifications: () -> Unit,
+    onLock: () -> Unit,
+    onSetDefault: () -> Unit,
+) {
     val context = LocalContext.current
     val view = LocalView.current
     val is24h = remember { DateFormat.is24HourFormat(context) }
     val timeFormat = remember(is24h) { SimpleDateFormat(if (is24h) "HH:mm" else "h:mm", Locale.getDefault()) }
-    var showTop by rememberSaveable { mutableStateOf(false) }
     val focusing = state.isFocusing(now)
     val homeApps = if (focusing) state.apps.filter { it.packageName in state.focusApps } else state.favorites
 
     Column(
         Modifier
             .fillMaxSize()
-            .background(UnloopColors.Bg)
-            // Swipes: up = all apps (locked while focusing); with gestures on, down =
-            // notifications and right = camera. Double-tap on empty space locks the screen.
+            // Vertical swipes only (horizontal ones turn the page): up = all apps (not while
+            // focusing), down = notifications. Double-tap on empty space locks the screen.
             .pointerInput(focusing, state.gestures) {
-                var dx = 0f
                 var dy = 0f
-                detectDragGestures(
-                    onDragStart = {
-                        dx = 0f
-                        dy = 0f
-                    },
+                detectVerticalDragGestures(
+                    onDragStart = { dy = 0f },
                     onDragEnd = {
-                        val threshold = 150f
                         when {
-                            abs(dy) > abs(dx) && dy < -threshold && !focusing -> onAllApps()
-                            abs(dy) > abs(dx) && dy > threshold && state.gestures -> onNotifications()
-                            abs(dx) > abs(dy) && dx > threshold && state.gestures -> onCamera()
-                            abs(dx) > abs(dy) && dx < -threshold && state.gestures -> onOpenTasks()
+                            dy < -150f && !focusing -> onAllApps()
+                            dy > 150f && state.gestures -> onNotifications()
                         }
                     },
                 ) { change, amount ->
                     change.consume()
-                    dx += amount.x
-                    dy += amount.y
+                    dy += amount
                 }
             }
             .pointerInput(state.gestures) {
@@ -154,40 +207,34 @@ fun HomeScreen(
             .padding(horizontal = 28.dp),
     ) {
         Spacer(Modifier.height(36.dp))
-        Row(verticalAlignment = Alignment.Bottom) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(Date(now)).uppercase(),
-                    color = UnloopColors.TextSoft,
-                    fontFamily = Mono,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    letterSpacing = tracking(SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(Date(now)).uppercase(), 3.sp),
-                )
-                // Long-press the clock for settings.
-                Text(
-                    timeFormat.format(Date(now)),
-                    fontFamily = Display,
-                    fontWeight = FontWeight.ExtraBold,
-                    // Sized in dp: the clock is already huge, so it doesn't grow with system text size.
-                    fontSize = with(LocalDensity.current) { 92.dp.toSp() },
-                    lineHeight = with(LocalDensity.current) { 96.dp.toSp() },
-                    letterSpacing = tracking(timeFormat.format(Date(now)), (-4).sp),
-                    modifier = Modifier.combinedClickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {},
-                        onLongClick = {
-                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                            onSettings()
-                        },
-                    ),
-                )
-            }
-            state.streak?.let { streak ->
-                StreakPlant(streak = streak, overToday = state.overToday, onClick = onPlant)
-            }
-        }
+        val date = SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(Date(now)).uppercase()
+        Text(
+            date,
+            color = UnloopColors.TextSoft,
+            fontFamily = Mono,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            letterSpacing = tracking(date, 3.sp),
+        )
+        // Long-press the clock for settings.
+        Text(
+            timeFormat.format(Date(now)),
+            fontFamily = Display,
+            fontWeight = FontWeight.ExtraBold,
+            // Sized in dp: the clock is already huge, so it doesn't grow with system text size.
+            fontSize = with(LocalDensity.current) { 92.dp.toSp() },
+            lineHeight = with(LocalDensity.current) { 96.dp.toSp() },
+            letterSpacing = tracking(timeFormat.format(Date(now)), (-4).sp),
+            modifier = Modifier.combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = {},
+                onLongClick = {
+                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    onSettings()
+                },
+            ),
+        )
         state.nextEvent?.let { NextEventLine(it, timeFormat) }
         if (!state.isDefaultLauncher) {
             Label(
@@ -199,36 +246,12 @@ fun HomeScreen(
                     .padding(vertical = 6.dp),
             )
         }
-
-        Spacer(Modifier.height(24.dp))
         if (focusing) {
+            Spacer(Modifier.height(24.dp))
             FocusCard(focusUntil = state.focusUntil, silenced = state.focusSilenced, schedule = state.focusSchedule, timeFormat = timeFormat)
-        } else {
-            ScreenTimeCard(
-                state = state,
-                expanded = showTop,
-                onToggle = { showTop = !showTop },
-                onGrant = onGrantUsage,
-                onWeek = onWeek,
-            )
-            if (state.showTasks) {
-                Spacer(Modifier.height(16.dp))
-                TasksCard(state, onOpen = onOpenTasks, onToggle = onToggleTask, onAdd = onAddTask)
-            }
-            if (state.showReflectionNudge && state.hasUsageAccess) {
-                Spacer(Modifier.height(14.dp))
-                Label(
-                    stringResource(R.string.week_ready),
-                    color = UnloopColors.Lime,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable(onClick = onWeek)
-                        .padding(vertical = 6.dp),
-                )
-            }
         }
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(40.dp))
         // Fit every home app on screen: on small screens or with large system text, first drop
         // the quote, then shrink the names. Apps must never be cut off.
         BoxWithConstraints(
@@ -304,19 +327,19 @@ fun HomeScreen(
                         }
                     }
                 }
-            if (homeApps.isEmpty() && state.apps.isNotEmpty()) {
-                Text(
-                    stringResource(if (focusing) R.string.focus_empty else R.string.home_empty),
-                    color = UnloopColors.Muted,
-                    fontFamily = Display,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 17.sp,
-                )
-            }
-            if (layout.showQuote) {
-                Spacer(Modifier.weight(1f))
-                Quote(state.quoteIndex)
-            }
+                if (homeApps.isEmpty() && state.apps.isNotEmpty()) {
+                    Text(
+                        stringResource(if (focusing) R.string.focus_empty else R.string.home_empty),
+                        color = UnloopColors.Muted,
+                        fontFamily = Display,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 17.sp,
+                    )
+                }
+                if (layout.showQuote) {
+                    Spacer(Modifier.weight(1f))
+                    Quote(state.quoteIndex)
+                }
             }
         }
 
@@ -339,32 +362,103 @@ fun HomeScreen(
                 )
             }
         }
-        Spacer(Modifier.height(20.dp))
+        // Room for the page dots.
+        Spacer(Modifier.height(32.dp))
+    }
+}
+
+/** Page 2: today at a glance. Screen time, to-do and the streak plant. */
+@Composable
+private fun TodayPage(
+    state: UiState,
+    onWeek: () -> Unit,
+    onPlant: () -> Unit,
+    onOpenTasks: () -> Unit,
+    onToggleTask: (Long) -> Unit,
+    onAddTask: () -> Unit,
+    onGrantUsage: () -> Unit,
+) {
+    var showTop by rememberSaveable { mutableStateOf(false) }
+    Column(
+        Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 28.dp),
+    ) {
+        Spacer(Modifier.height(36.dp))
+        val title = stringResource(R.string.today)
+        Text(title, fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 44.sp, letterSpacing = tracking(title, (-1.5).sp))
+        Spacer(Modifier.height(24.dp))
+        ScreenTimeCard(state = state, expanded = showTop, onToggle = { showTop = !showTop }, onGrant = onGrantUsage, onWeek = onWeek)
+        if (state.showTasks) {
+            Spacer(Modifier.height(18.dp))
+            TasksCard(state, onOpen = onOpenTasks, onToggle = onToggleTask, onAdd = onAddTask)
+        }
+        state.streak?.let { streak ->
+            Spacer(Modifier.height(18.dp))
+            PlantCard(streak = streak, overToday = state.overToday, onClick = onPlant)
+        }
+        if (state.showReflectionNudge && state.hasUsageAccess) {
+            Spacer(Modifier.height(14.dp))
+            Label(
+                stringResource(R.string.week_ready),
+                color = UnloopColors.Lime,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable(onClick = onWeek)
+                    .padding(vertical = 6.dp),
+            )
+        }
+        Spacer(Modifier.height(48.dp))
+    }
+}
+
+@Composable
+private fun PlantCard(streak: Int, overToday: Boolean, onClick: () -> Unit) {
+    PopCard(
+        modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onClick,
+        ),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Plant(streak = streak, wilting = overToday, modifier = Modifier.size(width = 52.dp, height = 60.dp))
+            Spacer(Modifier.width(16.dp))
+            Column {
+                Label(stringResource(R.string.plant_title))
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    if (overToday) stringResource(R.string.plant_over_today) else pluralStringResource(R.plurals.plant_streak, streak, streak),
+                    color = if (overToday) UnloopColors.Orange else UnloopColors.Text,
+                    fontFamily = Display,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    lineHeight = 21.sp,
+                )
+            }
+        }
+    }
+}
+
+/** Two small dots showing which home page is in view. */
+@Composable
+private fun PageDots(current: Int, modifier: Modifier = Modifier) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        repeat(2) { i ->
+            Box(
+                Modifier
+                    .size(if (i == current) 8.dp else 6.dp)
+                    .clip(CircleShape)
+                    .background(if (i == current) UnloopColors.Lime else UnloopColors.Faint),
+            )
+        }
     }
 }
 
 /** How the home app names are laid out to fit the space left on screen. */
 private data class HomeLayout(val nameSize: TextUnit, val showQuote: Boolean, val columns: Int, val scrolls: Boolean = false)
-
-@Composable
-private fun StreakPlant(streak: Int, overToday: Boolean, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(bottom = 14.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(6.dp),
-    ) {
-        Plant(streak = streak, wilting = overToday, modifier = Modifier.size(width = 56.dp, height = 64.dp))
-        Spacer(Modifier.height(4.dp))
-        Label(
-            if (overToday) stringResource(R.string.streak_over_today) else pluralStringResource(R.plurals.streak_days, streak, streak),
-            color = if (overToday) UnloopColors.Muted else UnloopColors.Lime,
-            size = 10.sp,
-        )
-    }
-}
 
 @Composable
 private fun NextEventLine(event: NextEvent, timeFormat: SimpleDateFormat) {
@@ -625,7 +719,7 @@ private fun TasksCard(state: UiState, onOpen: () -> Unit, onToggle: (Long) -> Un
                 modifier = Modifier.padding(vertical = 6.dp),
             )
         }
-        open.take(3).forEach { task ->
+        open.take(5).forEach { task ->
             Row(Modifier.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 TaskCheck(done = false, onClick = { onToggle(task.id) }, size = 22)
                 Spacer(Modifier.width(12.dp))

@@ -7,7 +7,6 @@ import com.unloop.launcher.ui.screens.DailyLimitSheet
 import com.unloop.launcher.service.UnloopAccessibilityService
 import com.unloop.launcher.data.Gate
 import androidx.compose.runtime.rememberCoroutineScope
-import android.provider.MediaStore
 import android.annotation.SuppressLint
 import android.Manifest
 import android.app.LocaleManager
@@ -206,7 +205,6 @@ class MainActivity : ComponentActivity() {
                     },
                     onPlant = { plantSheet = true },
                     onNotifications = ::expandNotifications,
-                    onCamera = { openSettings(Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA)) },
                     onOpenTasks = { screen = Screen.Tasks },
                     onToggleTask = vm::toggleTask,
                     onAddTask = { addingTask = true },
@@ -218,6 +216,7 @@ class MainActivity : ComponentActivity() {
                     onGrantUsage = ::openUsageAccess,
                     onSetDefault = ::requestDefaultLauncher,
                     onMinuteTick = vm::refreshUsage,
+                    homePresses = homePresses,
                 )
                 Screen.AllApps -> AllAppsScreen(
                     state = state,

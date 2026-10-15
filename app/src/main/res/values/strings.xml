@@ -268,7 +268,7 @@
         <item>S</item>
     </string-array>
     <string name="gestures">Gestures</string>
-    <string name="gestures_hint">Swipe up: all apps · Swipe down: notifications · Swipe right: camera · Swipe left: to-do · Double-tap: lock screen</string>
+    <string name="gestures_hint">Swipe up: all apps · Swipe down: notifications · Double-tap: lock screen. Swipe sideways for Today.</string>
     <string name="lock_needs_accessibility">Turn on Pause everywhere in Settings to lock with a double-tap.</string>
     <!-- Settings overview -->
     <string name="cat_screen_time">Screen time</string>
@@ -342,6 +342,7 @@
     <string name="no_notes">No notes yet.</string>
     <string name="empty_note">Empty note</string>
     <string name="show_tasks">To-do on home</string>
-    <string name="show_tasks_hint">Your next three tasks on the home screen. Swipe left on home for the full list and notes.</string>
+    <string name="show_tasks_hint">Your open tasks on the Today page (swipe left on home). Tap the card for the full list and notes.</string>
     <string name="just_now">Just now</string>
+    <string name="today">Today</string>
 </resources>
