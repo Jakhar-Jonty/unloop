@@ -219,7 +219,13 @@ private fun Welcome(onNext: () -> Unit) {
         Spacer(Modifier.weight(1f))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("unl", fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 64.sp, letterSpacing = (-2).sp, modifier = Modifier.graphicsLayer { alpha = reveal.value })
-            LoopMark(progress = draw.value, modifier = Modifier.size(width = 118.dp, height = 56.dp))
+            // Sized to the letters' x-height, so the loop reads as the "oo".
+            LoopMark(
+                progress = draw.value,
+                modifier = Modifier
+                    .padding(start = 2.dp, end = 2.dp, top = 8.dp)
+                    .size(width = 76.dp, height = 36.dp),
+            )
             Text("p", fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 64.sp, modifier = Modifier.graphicsLayer { alpha = reveal.value })
         }
         Spacer(Modifier.height(36.dp))
