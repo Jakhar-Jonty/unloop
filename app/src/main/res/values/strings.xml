@@ -40,14 +40,15 @@
         <item quantity="one">%d day</item>
         <item quantity="other">%d days</item>
     </plurals>
-    <string name="streak_over_today">Over today</string>
-    <string name="plant_title">Your plant</string>
-    <string name="plant_body">Every day you stay under your %s limit, it grows a little. Go over and it starts again from a seed.</string>
-    <plurals name="plant_streak">
-        <item quantity="one">%d day in a row so far.</item>
-        <item quantity="other">%d days in a row so far.</item>
+    <string name="plant_title">Protect your plant</string>
+    <string name="plant_body">It starts every day with 7 leaves. Go over your %1$s limit and one falls, then another every %2$d minutes. Keep every leaf for %3$d days in a row and it flowers.</string>
+    <string name="leaves_left">%1$d of %2$d leaves</string>
+    <string name="leaves_all_safe">All leaves safe</string>
+    <plurals name="days_protected">
+        <item quantity="one">%d day protected</item>
+        <item quantity="other">%d days protected</item>
     </plurals>
-    <string name="plant_over_today">You\'re over your limit today, so it starts again tomorrow.</string>
+    <string name="leaf_falls_soon">Next leaf falls in %s</string>
     <string name="plant_ok">Got it</string>
 
     <!-- All apps -->
@@ -310,11 +311,7 @@
     <string name="add_app">+  Add app</string>
     <string name="done">Done</string>
     <string name="lock_wallpaper">Lock screen wallpaper</string>
-    <string name="lock_wallpaper_hint">Shows today\'s screen time, your streak and a quote on the lock screen. Turning it off brings back the phone\'s default lock wallpaper.</string>
-    <plurals name="streak_label">
-        <item quantity="one">%d-day streak</item>
-        <item quantity="other">%d-day streak</item>
-    </plurals>
+    <string name="lock_wallpaper_hint">Shows today\'s screen time, your plant and a quote on the lock screen. Turning it off brings back the phone\'s default lock wallpaper.</string>
     <string name="lock_layout">Layout</string>
     <string name="lock_compact">Compact</string>
     <string name="lock_full">Full</string>

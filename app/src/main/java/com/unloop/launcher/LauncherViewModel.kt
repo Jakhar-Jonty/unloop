@@ -18,6 +18,9 @@ import com.unloop.launcher.data.Gatekeeper
 import com.unloop.launcher.data.Schedule
 import com.unloop.launcher.data.ScheduleController
 import com.unloop.launcher.service.UnloopAccessibilityService
+import com.unloop.launcher.ui.components.FLOWER_DAYS
+import com.unloop.launcher.ui.components.MAX_LEAVES
+import com.unloop.launcher.ui.components.leavesLeft
 import com.unloop.launcher.data.History
 import com.unloop.launcher.data.LOCK_BOTTOM
 import com.unloop.launcher.data.LOCK_COMPACT
@@ -93,6 +96,12 @@ data class UiState(
     fun isFocusing(now: Long = System.currentTimeMillis()): Boolean = now < focusUntil
 
     fun isStrict(now: Long = System.currentTimeMillis()): Boolean = now < strictUntil
+
+    /** Leaves left on today's plant (all of them until the limit is crossed). */
+    val leaves: Int get() = usage?.let { leavesLeft(it.totalMs, limitMinutes) } ?: MAX_LEAVES
+
+    /** Every leaf kept for a week in a row: the plant flowers. */
+    val flowering: Boolean get() = (streak ?: 0) >= FLOWER_DAYS
 
     /** True once today's screen time has passed the limit. */
     val overToday: Boolean get() = (usage?.totalMs ?: 0L) >= limitMinutes * 60_000L

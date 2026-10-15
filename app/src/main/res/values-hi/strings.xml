@@ -38,14 +38,15 @@
         <item quantity="one">%d दिन</item>
         <item quantity="other">%d दिन</item>
     </plurals>
-    <string name="streak_over_today">आज सीमा पार</string>
-    <string name="plant_title">आपका पौधा</string>
-    <string name="plant_body">जिस दिन आप %s की सीमा में रहते हैं, यह थोड़ा बढ़ता है। सीमा पार की तो यह फिर से बीज से शुरू होगा।</string>
-    <plurals name="plant_streak">
-        <item quantity="one">अब तक लगातार %d दिन।</item>
-        <item quantity="other">अब तक लगातार %d दिन।</item>
+    <string name="plant_title">अपने पौधे को बचाइए</string>
+    <string name="plant_body">हर दिन इसमें 7 पत्तियाँ होती हैं। %1$s की सीमा पार करते ही एक पत्ती गिरती है, फिर हर %2$d मिनट में एक और। लगातार %3$d दिन सारी पत्तियाँ बचाइए, तो इसमें फूल खिलेगा।</string>
+    <string name="leaves_left">%2$d में से %1$d पत्तियाँ</string>
+    <string name="leaves_all_safe">सारी पत्तियाँ सुरक्षित</string>
+    <plurals name="days_protected">
+        <item quantity="one">%d दिन बचाया</item>
+        <item quantity="other">%d दिन बचाया</item>
     </plurals>
-    <string name="plant_over_today">आज आप सीमा पार कर चुके हैं, इसलिए कल से फिर शुरू होगा।</string>
+    <string name="leaf_falls_soon">अगली पत्ती %s में गिरेगी</string>
     <string name="plant_ok">ठीक है</string>
 
     <!-- All apps -->
@@ -308,11 +309,7 @@
     <string name="add_app">+  ऐप जोड़ें</string>
     <string name="done">हो गया</string>
     <string name="lock_wallpaper">लॉक स्क्रीन वॉलपेपर</string>
-    <string name="lock_wallpaper_hint">लॉक स्क्रीन पर आज का स्क्रीन टाइम, आपकी लगातार दिनों की गिनती और एक विचार दिखाता है। बंद करने पर फ़ोन का डिफ़ॉल्ट लॉक वॉलपेपर वापस आ जाएगा।</string>
-    <plurals name="streak_label">
-        <item quantity="one">लगातार %d दिन</item>
-        <item quantity="other">लगातार %d दिन</item>
-    </plurals>
+    <string name="lock_wallpaper_hint">लॉक स्क्रीन पर आज का स्क्रीन टाइम, आपका पौधा और एक विचार दिखाता है। बंद करने पर फ़ोन का डिफ़ॉल्ट लॉक वॉलपेपर वापस आ जाएगा।</string>
     <string name="lock_layout">लेआउट</string>
     <string name="lock_compact">छोटा</string>
     <string name="lock_full">पूरा</string>

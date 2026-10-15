@@ -22,7 +22,9 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import com.unloop.launcher.R
 import com.unloop.launcher.ui.components.drawPlant
-import com.unloop.launcher.ui.components.plantStage
+import com.unloop.launcher.ui.components.FLOWER_DAYS
+import com.unloop.launcher.ui.components.MAX_LEAVES
+import com.unloop.launcher.ui.components.leavesLeft
 import com.unloop.launcher.ui.formatDuration
 import com.unloop.launcher.ui.formatLimit
 
@@ -203,8 +205,9 @@ object LockWallpaper {
         if (full) {
             // Row 4: plant and streak.
             y += barH + dp(20f)
-            drawPlantBitmap(context, canvas, streak, over, x - dp(6f), y, plantW, plantH)
-            val streakText = res.getQuantityString(R.plurals.streak_label, streak, streak).uppercase()
+            val leaves = leavesLeft(usage.totalMs, limitMinutes)
+            drawPlantBitmap(context, canvas, leaves, streak >= FLOWER_DAYS, x - dp(6f), y, plantW, plantH)
+            val streakText = res.getString(R.string.leaves_left, leaves, MAX_LEAVES).uppercase()
             canvas.drawText(streakText, x + plantW + dp(8f), y + plantH / 2 + labelH / 2, labelPaint(accent))
 
             quoteLayout?.let {
@@ -234,10 +237,10 @@ object LockWallpaper {
     }
 
     /** The same plant as on the home screen, drawn with Compose into a small bitmap. */
-    private fun drawPlantBitmap(context: Context, canvas: Canvas, streak: Int, wilting: Boolean, x: Float, y: Float, w: Float, h: Float) {
+    private fun drawPlantBitmap(context: Context, canvas: Canvas, leaves: Int, flowering: Boolean, x: Float, y: Float, w: Float, h: Float) {
         val image = ImageBitmap(w.toInt(), h.toInt())
         CanvasDrawScope().draw(Density(context), LayoutDirection.Ltr, androidx.compose.ui.graphics.Canvas(image), Size(w, h)) {
-            drawPlant(plantStage(streak), if (wilting) 1f else 0f)
+            drawPlant(leaves, flowering)
         }
         canvas.drawBitmap(image.asAndroidBitmap(), x, y, null)
     }

@@ -1,5 +1,9 @@
 package com.unloop.launcher.ui.screens
 
+import com.unloop.launcher.ui.components.nextLeafInMs
+import com.unloop.launcher.ui.components.MAX_LEAVES
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.pager.rememberPagerState
@@ -113,6 +117,7 @@ fun HomeScreen(
     val now by rememberMinuteClock()
     LaunchedEffect(now) { onMinuteTick() }
     val pager = rememberPagerState { 2 }
+    val scope = rememberCoroutineScope()
     // Home button always lands on the main page.
     LaunchedEffect(homePresses) { pager.scrollToPage(0) }
 
@@ -135,6 +140,9 @@ fun HomeScreen(
                     onNotifications = onNotifications,
                     onLock = onLock,
                     onSetDefault = onSetDefault,
+                    onPlant = onPlant,
+                    onShowToday = { scope.launch { pager.animateScrollToPage(1) } },
+                    onGrantUsage = onGrantUsage,
                 )
             } else {
                 TodayPage(
@@ -172,6 +180,9 @@ private fun MainPage(
     onNotifications: () -> Unit,
     onLock: () -> Unit,
     onSetDefault: () -> Unit,
+    onPlant: () -> Unit,
+    onShowToday: () -> Unit,
+    onGrantUsage: () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -216,25 +227,40 @@ private fun MainPage(
             fontSize = 14.sp,
             letterSpacing = tracking(date, 3.sp),
         )
-        // Long-press the clock for settings.
-        Text(
-            timeFormat.format(Date(now)),
-            fontFamily = Display,
-            fontWeight = FontWeight.ExtraBold,
-            // Sized in dp: the clock is already huge, so it doesn't grow with system text size.
-            fontSize = with(LocalDensity.current) { 92.dp.toSp() },
-            lineHeight = with(LocalDensity.current) { 96.dp.toSp() },
-            letterSpacing = tracking(timeFormat.format(Date(now)), (-4).sp),
-            modifier = Modifier.combinedClickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = {},
-                onLongClick = {
-                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    onSettings()
-                },
-            ),
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // Long-press the clock for settings.
+            Text(
+                timeFormat.format(Date(now)),
+                fontFamily = Display,
+                fontWeight = FontWeight.ExtraBold,
+                // Sized in dp: the clock is already huge, so it doesn't grow with system text size.
+                fontSize = with(LocalDensity.current) { 92.dp.toSp() },
+                lineHeight = with(LocalDensity.current) { 96.dp.toSp() },
+                letterSpacing = tracking(timeFormat.format(Date(now)), (-4).sp),
+                modifier = Modifier
+                    .weight(1f)
+                    .combinedClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {},
+                        onLongClick = {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            onSettings()
+                        },
+                    ),
+            )
+            if (state.hasUsageAccess && state.usage != null) {
+                Plant(
+                    leaves = state.leaves,
+                    flowering = state.flowering,
+                    modifier = Modifier
+                        .size(width = 64.dp, height = 76.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable(onClick = onPlant),
+                )
+            }
+        }
+        TimeStrip(state, onClick = onShowToday, onGrant = onGrantUsage)
         state.nextEvent?.let { NextEventLine(it, timeFormat) }
         if (!state.isDefaultLauncher) {
             Label(
@@ -251,7 +277,7 @@ private fun MainPage(
             FocusCard(focusUntil = state.focusUntil, silenced = state.focusSilenced, schedule = state.focusSchedule, timeFormat = timeFormat)
         }
 
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(32.dp))
         // Fit every home app on screen: on small screens or with large system text, first drop
         // the quote, then shrink the names. Apps must never be cut off.
         BoxWithConstraints(
@@ -395,9 +421,9 @@ private fun TodayPage(
             Spacer(Modifier.height(18.dp))
             TasksCard(state, onOpen = onOpenTasks, onToggle = onToggleTask, onAdd = onAddTask)
         }
-        state.streak?.let { streak ->
+        if (state.usage != null) {
             Spacer(Modifier.height(18.dp))
-            PlantCard(streak = streak, overToday = state.overToday, onClick = onPlant)
+            PlantCard(state, onClick = onPlant)
         }
         if (state.showReflectionNudge && state.hasUsageAccess) {
             Spacer(Modifier.height(14.dp))
@@ -415,8 +441,10 @@ private fun TodayPage(
 }
 
 @Composable
-private fun PlantCard(streak: Int, overToday: Boolean, onClick: () -> Unit) {
+private fun PlantCard(state: UiState, onClick: () -> Unit) {
+    val leaves = state.leaves
     PopCard(
+        edge = if (leaves == MAX_LEAVES) UnloopColors.LimeEdge else UnloopColors.Orange,
         modifier = Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
@@ -424,20 +452,105 @@ private fun PlantCard(streak: Int, overToday: Boolean, onClick: () -> Unit) {
         ),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Plant(streak = streak, wilting = overToday, modifier = Modifier.size(width = 52.dp, height = 60.dp))
-            Spacer(Modifier.width(16.dp))
+            Plant(leaves = leaves, flowering = state.flowering, modifier = Modifier.size(width = 72.dp, height = 84.dp))
+            Spacer(Modifier.width(18.dp))
             Column {
                 Label(stringResource(R.string.plant_title))
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(6.dp))
                 Text(
-                    if (overToday) stringResource(R.string.plant_over_today) else pluralStringResource(R.plurals.plant_streak, streak, streak),
-                    color = if (overToday) UnloopColors.Orange else UnloopColors.Text,
+                    if (leaves == MAX_LEAVES) stringResource(R.string.leaves_all_safe) else stringResource(R.string.leaves_left, leaves, MAX_LEAVES),
+                    color = if (leaves == MAX_LEAVES) UnloopColors.Text else UnloopColors.Orange,
                     fontFamily = Display,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    lineHeight = 21.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 22.sp,
+                )
+                val used = state.usage?.totalMs ?: 0L
+                nextLeafInMs(used, state.limitMinutes)?.let { ms ->
+                    Text(
+                        stringResource(R.string.leaf_falls_soon, duration(ms + 59_999)),
+                        color = UnloopColors.TextSoft,
+                        fontFamily = Display,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                    )
+                }
+                val streak = state.streak ?: 0
+                Text(
+                    pluralStringResource(R.plurals.days_protected, streak, streak),
+                    color = UnloopColors.Lime,
+                    fontFamily = Mono,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 4.dp),
                 )
             }
+        }
+    }
+}
+
+/** Slim "time used of limit" line under the clock, with a thin bar. Tap for the Today page. */
+@Composable
+private fun TimeStrip(state: UiState, onClick: () -> Unit, onGrant: () -> Unit) {
+    val usage = state.usage
+    if (!state.hasUsageAccess || usage == null) {
+        Label(
+            stringResource(R.string.allow_usage_access) + "  →",
+            color = UnloopColors.Orange,
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable(onClick = onGrant)
+                .padding(vertical = 8.dp),
+        )
+        return
+    }
+    val limitMs = state.limitMinutes * 60_000L
+    val over = usage.totalMs >= limitMs
+    val accent = if (over) UnloopColors.Orange else UnloopColors.Lime
+    Column(
+        Modifier
+            .padding(top = 8.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            ),
+    ) {
+        Row {
+            Text(
+                duration(usage.totalMs),
+                fontFamily = Display,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 20.sp,
+                modifier = Modifier.alignByBaseline(),
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                stringResource(if (over) R.string.over_limit else R.string.of_limit, limit(state.limitMinutes)),
+                color = UnloopColors.TextSoft,
+                fontFamily = Display,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .weight(1f)
+                    .alignByBaseline(),
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(5.dp)
+                .clip(CircleShape)
+                .background(UnloopColors.Border),
+        ) {
+            Box(
+                Modifier
+                    .fillMaxWidth((usage.totalMs.toFloat() / limitMs).coerceIn(0.02f, 1f))
+                    .height(5.dp)
+                    .clip(CircleShape)
+                    .background(accent),
+            )
         }
     }
 }

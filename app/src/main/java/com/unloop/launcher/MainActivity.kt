@@ -1,5 +1,8 @@
 package com.unloop.launcher
 
+import com.unloop.launcher.ui.components.MAX_LEAVES
+import com.unloop.launcher.ui.components.LEAF_MINUTES
+import com.unloop.launcher.ui.components.FLOWER_DAYS
 import kotlinx.coroutines.launch
 import com.unloop.launcher.ui.screens.LimitReached
 import com.unloop.launcher.ui.screens.LIMIT_WAIT_SECONDS
@@ -376,15 +379,16 @@ class MainActivity : ComponentActivity() {
 
         if (plantSheet) {
             val streak = state.streak ?: 0
+            val leaves = state.leaves
             UnloopSheet(onDismiss = { plantSheet = false }) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Plant(streak = streak, wilting = state.overToday, modifier = Modifier.size(width = 105.dp, height = 120.dp))
+                    Plant(leaves = leaves, flowering = state.flowering, modifier = Modifier.size(width = 120.dp, height = 140.dp))
                 }
                 Spacer(Modifier.height(16.dp))
                 Text(stringResource(R.string.plant_title), fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 30.sp)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    stringResource(R.string.plant_body, limit(state.limitMinutes)),
+                    stringResource(R.string.plant_body, limit(state.limitMinutes), LEAF_MINUTES, FLOWER_DAYS),
                     color = UnloopColors.TextSoft,
                     fontFamily = Display,
                     fontWeight = FontWeight.SemiBold,
@@ -393,12 +397,18 @@ class MainActivity : ComponentActivity() {
                 )
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    if (state.overToday) stringResource(R.string.plant_over_today)
-                    else pluralStringResource(R.plurals.plant_streak, streak, streak),
-                    color = if (state.overToday) UnloopColors.Orange else UnloopColors.Lime,
+                    if (leaves == MAX_LEAVES) stringResource(R.string.leaves_all_safe) else stringResource(R.string.leaves_left, leaves, MAX_LEAVES),
+                    color = if (leaves == MAX_LEAVES) UnloopColors.Lime else UnloopColors.Orange,
                     fontFamily = Display,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
+                )
+                Text(
+                    pluralStringResource(R.plurals.days_protected, streak, streak),
+                    color = UnloopColors.TextSoft,
+                    fontFamily = Display,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 15.sp,
                 )
                 Spacer(Modifier.height(24.dp))
                 PopButton(stringResource(R.string.plant_ok), onClick = { plantSheet = false }, modifier = Modifier.fillMaxWidth())
