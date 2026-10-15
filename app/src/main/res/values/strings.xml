@@ -357,7 +357,7 @@
     <!-- First-run setup -->
     <string name="ob_welcome_title">Use your phone\non purpose.</string>
     <string name="ob_welcome_body">Unloop is a calm home screen that puts a pause between you and the endless scroll.</string>
-    <string name="ob_start">Let\'s begin</string>
+    <string name="ob_start">Let\'s unloop</string>
     <string name="ob_home_title">Make Unloop\nyour home</string>
     <string name="ob_home_body">Unloop replaces your home screen: just the apps you choose, as plain text. Everything else is one swipe away.</string>
     <string name="ob_set_home">Set as home screen</string>

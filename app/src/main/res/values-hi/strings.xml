@@ -355,7 +355,7 @@
     <!-- First-run setup -->
     <string name="ob_welcome_title">फ़ोन सोच-समझकर\nचलाइए।</string>
     <string name="ob_welcome_body">Unloop एक शांत होम स्क्रीन है जो आपके और अंतहीन स्क्रॉल के बीच एक ठहराव रखता है।</string>
-    <string name="ob_start">शुरू करें</string>
+    <string name="ob_start">चलिए, Unloop करें</string>
     <string name="ob_home_title">Unloop को होम\nबनाइए</string>
     <string name="ob_home_body">Unloop आपकी होम स्क्रीन बन जाता है: सिर्फ़ आपके चुने ऐप्स, सादे टेक्स्ट में। बाकी सब एक स्वाइप दूर।</string>
     <string name="ob_set_home">होम स्क्रीन बनाएं</string>
