@@ -88,6 +88,8 @@ data class UiState(
     val tasks: List<Task> = emptyList(),
     val notes: List<Note> = emptyList(),
     val showTasks: Boolean = true,
+    /** Null until preferences are read, so the first frame never flashes the wrong screen. */
+    val onboarded: Boolean? = null,
 ) {
     /** Open tasks first (oldest first), then done ones (most recently finished first). */
     val openTasks: List<Task> get() = tasks.filter { !it.done }.sortedBy { it.createdAt }
@@ -406,6 +408,16 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
         _state.update { it.copy(notes = notes) }
     }
 
+    fun finishOnboarding() {
+        prefs.onboarded = true
+        publish()
+    }
+
+    fun restartOnboarding() {
+        prefs.onboarded = false
+        publish()
+    }
+
     fun setGestures(on: Boolean) {
         prefs.gestures = on
         publish()
@@ -560,6 +572,7 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
                 lockStyle = prefs.lockStyle,
                 lockPosition = prefs.lockPosition,
                 showTasks = prefs.showTasks,
+                onboarded = prefs.onboarded,
                 schedules = prefs.schedules,
                 focusSchedule = prefs.focusSchedule,
             )

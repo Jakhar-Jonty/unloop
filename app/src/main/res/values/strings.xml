@@ -354,4 +354,34 @@
     </plurals>
     <string name="show_all_tasks">Show all %d</string>
     <string name="show_less">Show less</string>
+    <!-- First-run setup -->
+    <string name="ob_welcome_title">Use your phone\non purpose.</string>
+    <string name="ob_welcome_body">Unloop is a calm home screen that puts a pause between you and the endless scroll.</string>
+    <string name="ob_start">Let\'s begin</string>
+    <string name="ob_home_title">Make Unloop\nyour home</string>
+    <string name="ob_home_body">Unloop replaces your home screen: just the apps you choose, as plain text. Everything else is one swipe away.</string>
+    <string name="ob_set_home">Set as home screen</string>
+    <string name="ob_usage_title">See where your\ntime goes</string>
+    <string name="ob_usage_body">Allow usage access so Unloop can show today\'s screen time and protect your plant. It never leaves your phone.</string>
+    <string name="ob_allow">Allow access</string>
+    <string name="ob_apps_title">Pick your\nhome apps</string>
+    <string name="ob_apps_body">The few you really need. Up to %d.</string>
+    <string name="ob_pause_title">What pulls\nyou in?</string>
+    <string name="ob_pause_body">These get a short breathing pause before they open.</string>
+    <string name="ob_limit_title">Set a daily\nlimit</string>
+    <string name="ob_limit_body">Your plant starts every day with 7 leaves. Go over this and they start to fall.</string>
+    <string name="ob_everywhere_title">Pause\neverywhere</string>
+    <string name="ob_everywhere_body">Opening an app from a notification or Recents skips the pause. Turn on “Unloop: pause everywhere” in Accessibility to catch those too.</string>
+    <string name="ob_sees">Unloop sees which app is open.</string>
+    <string name="ob_never">It never reads your screen, messages or what you type.</string>
+    <string name="ob_turn_on">Turn on</string>
+    <string name="ob_done_title">You\'re all set.</string>
+    <string name="ob_done_body">Swipe left on home for Today, long-press the clock for Settings. Look after your plant.</string>
+    <string name="ob_go">Start using Unloop</string>
+    <string name="ob_next">Next</string>
+    <string name="ob_later">Not now</string>
+    <string name="ob_done_check">Done</string>
+    <string name="ob_selected">%1$d of %2$d</string>
+    <string name="setup_guide">Setup guide</string>
+    <string name="setup_guide_hint">Walk through the first-run setup again</string>
 </resources>

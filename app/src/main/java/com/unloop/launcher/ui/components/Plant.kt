@@ -46,16 +46,17 @@ fun nextLeafInMs(usedMs: Long, limitMinutes: Int): Long? {
  * and lie on the soil. Keeping every leaf for [FLOWER_DAYS] days in a row makes it flower.
  */
 @Composable
-fun Plant(leaves: Int, flowering: Boolean, modifier: Modifier = Modifier) {
-    Canvas(modifier) { drawPlant(leaves, flowering) }
+fun Plant(leaves: Int, flowering: Boolean, modifier: Modifier = Modifier, growing: Boolean = false) {
+    Canvas(modifier) { drawPlant(leaves, flowering, growing) }
 }
 
 /** Draws the plant filling this draw scope. Shared by the home screen and the lock-screen wallpaper. */
-fun DrawScope.drawPlant(leaves: Int, flowering: Boolean) {
+/** [growing]: leaves not there yet are simply missing (no fallen leaves, no droop), for grow-in animations. */
+fun DrawScope.drawPlant(leaves: Int, flowering: Boolean, growing: Boolean = false) {
     val kept = leaves.coerceIn(0, MAX_LEAVES)
     val lost = MAX_LEAVES - kept
     // The more it has lost, the more the remaining leaves droop and fade.
-    val wilt = lost / MAX_LEAVES.toFloat()
+    val wilt = if (growing) 0f else lost / MAX_LEAVES.toFloat()
     val leafColor = lerp(UnloopColors.Lime, UnloopColors.Muted, wilt * 0.6f)
     val stemColor = if (kept == 0) UnloopColors.Faint else lerp(UnloopColors.LimeEdge, UnloopColors.Faint, wilt)
 
@@ -89,7 +90,7 @@ fun DrawScope.drawPlant(leaves: Int, flowering: Boolean) {
     }
 
     // Fallen leaves lying on the soil, so the loss stays visible for the day.
-    for (i in 0 until lost) {
+    for (i in 0 until if (growing) 0 else lost) {
         val x = w * (0.12f + 0.11f * i)
         leaf(Offset(x, ground - h * 0.03f), w * 0.16f, if (i % 2 == 0) -8f else 188f, UnloopColors.Muted)
     }

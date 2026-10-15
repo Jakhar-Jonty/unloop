@@ -14,6 +14,11 @@ const val MAX_FAVORITES = 6
 class Prefs(context: Context) {
     private val sp = context.getSharedPreferences("unloop", Context.MODE_PRIVATE)
 
+    /** First-run setup has been completed (or skipped to the end). */
+    var onboarded: Boolean
+        get() = sp.getBoolean("onboarded", false)
+        set(value) = sp.edit { putBoolean("onboarded", value) }
+
     var seeded: Boolean
         get() = sp.getBoolean("seeded", false)
         set(value) = sp.edit { putBoolean("seeded", value) }

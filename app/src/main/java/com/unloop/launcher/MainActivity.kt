@@ -1,5 +1,7 @@
 package com.unloop.launcher
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.slideInVertically
@@ -76,6 +78,8 @@ import com.unloop.launcher.ui.screens.ReflectionScreen
 import com.unloop.launcher.ui.screens.SettingsScreen
 import com.unloop.launcher.ui.screens.TaskActions
 import com.unloop.launcher.ui.screens.NoteEditor
+import com.unloop.launcher.ui.screens.OnboardingActions
+import com.unloop.launcher.ui.screens.OnboardingScreen
 import com.unloop.launcher.ui.screens.StartFocusSheet
 import com.unloop.launcher.ui.screens.UnloopSheet
 import com.unloop.launcher.ui.theme.Display
@@ -144,6 +148,31 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun UnloopApp() {
         val state by vm.state.collectAsStateWithLifecycle()
+        when (state.onboarded) {
+            // Preferences not read yet: plain background rather than a flash of the wrong screen.
+            null -> {
+                Box(Modifier.fillMaxSize().background(UnloopColors.Bg))
+                return
+            }
+            false -> {
+                OnboardingScreen(
+                    state = state,
+                    actions = remember {
+                        OnboardingActions(
+                            setHome = ::requestDefaultLauncher,
+                            grantUsage = ::openUsageAccess,
+                            toggleFavorite = vm::toggleFavorite,
+                            togglePaused = vm::togglePaused,
+                            setLimit = vm::setDailyLimit,
+                            openAccessibility = { openSettings(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
+                            finish = vm::finishOnboarding,
+                        )
+                    },
+                )
+                return
+            }
+            true -> Unit
+        }
         var screen by remember { mutableStateOf<Screen>(Screen.Home) }
         var sheetApp by remember { mutableStateOf<AppInfo?>(null) }
         var focusSheet by remember { mutableStateOf<FocusSheet?>(null) }
@@ -299,6 +328,7 @@ class MainActivity : ComponentActivity() {
                     onLockWallpaper = vm::setLockWallpaper,
                     onLockStyle = vm::setLockStyle,
                     onLockPosition = vm::setLockPosition,
+                    onSetupGuide = vm::restartOnboarding,
                     onShowTasks = vm::setShowTasks,
                     onGrantUsage = ::openUsageAccess,
                     onSetDefault = ::requestDefaultLauncher,

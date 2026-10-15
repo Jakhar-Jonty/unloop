@@ -145,6 +145,7 @@ fun SettingsScreen(
     onLockStyle: (String) -> Unit,
     onLockPosition: (String) -> Unit,
     onShowTasks: (Boolean) -> Unit,
+    onSetupGuide: () -> Unit,
 ) {
     var page by rememberSaveable { mutableStateOf<Page?>(null) }
     var picker by remember { mutableStateOf<Picker?>(null) }
@@ -158,7 +159,7 @@ fun SettingsScreen(
     ) { current ->
         val byLabel = compareBy<String> { state.labelFor(it).lowercase() }
         when (current) {
-            null -> Overview(state, language, onOpen = { page = it })
+            null -> Overview(state, language, onOpen = { page = it }, onSetupGuide = onSetupGuide)
             Page.ScreenTime -> PageScaffold(Page.ScreenTime, onBack = { page = null }) {
                 item { LimitCard(state, onSetLimit) }
                 appList(
@@ -333,7 +334,7 @@ private fun missingPermissions(state: UiState): Int =
     listOf(state.isDefaultLauncher, state.hasUsageAccess, state.pauseEverywhere || state.paused.isEmpty()).count { !it }
 
 @Composable
-private fun Overview(state: UiState, language: String?, onOpen: (Page) -> Unit) {
+private fun Overview(state: UiState, language: String?, onOpen: (Page) -> Unit, onSetupGuide: () -> Unit) {
     val dateTime = rememberDateTime()
     val attention = missingPermissions(state)
     LazyColumn(
@@ -438,6 +439,10 @@ private fun Overview(state: UiState, language: String?, onOpen: (Page) -> Unit) 
                     warn = attention > 0,
                     onClick = { onOpen(Page.Permissions) },
                 )
+            }
+            Spacer(Modifier.height(16.dp))
+            Group {
+                NavRow(stringResource(R.string.setup_guide), value = stringResource(R.string.setup_guide_hint), onClick = onSetupGuide)
             }
             Spacer(Modifier.height(32.dp))
             Text(

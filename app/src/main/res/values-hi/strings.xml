@@ -352,4 +352,34 @@
     </plurals>
     <string name="show_all_tasks">सभी %d दिखाएं</string>
     <string name="show_less">कम दिखाएं</string>
+    <!-- First-run setup -->
+    <string name="ob_welcome_title">फ़ोन सोच-समझकर\nचलाइए।</string>
+    <string name="ob_welcome_body">Unloop एक शांत होम स्क्रीन है जो आपके और अंतहीन स्क्रॉल के बीच एक ठहराव रखता है।</string>
+    <string name="ob_start">शुरू करें</string>
+    <string name="ob_home_title">Unloop को होम\nबनाइए</string>
+    <string name="ob_home_body">Unloop आपकी होम स्क्रीन बन जाता है: सिर्फ़ आपके चुने ऐप्स, सादे टेक्स्ट में। बाकी सब एक स्वाइप दूर।</string>
+    <string name="ob_set_home">होम स्क्रीन बनाएं</string>
+    <string name="ob_usage_title">देखिए समय\nकहाँ जाता है</string>
+    <string name="ob_usage_body">यूसेज एक्सेस दें ताकि Unloop आज का स्क्रीन टाइम दिखा सके और आपका पौधा बचा सके। यह जानकारी फ़ोन से बाहर नहीं जाती।</string>
+    <string name="ob_allow">अनुमति दें</string>
+    <string name="ob_apps_title">होम के ऐप्स\nचुनें</string>
+    <string name="ob_apps_body">बस वही जो सच में ज़रूरी हैं। ज़्यादा से ज़्यादा %d।</string>
+    <string name="ob_pause_title">किसमें खो\nजाते हैं?</string>
+    <string name="ob_pause_body">इन ऐप्स के खुलने से पहले साँस लेने का छोटा ठहराव आएगा।</string>
+    <string name="ob_limit_title">रोज़ की सीमा\nतय करें</string>
+    <string name="ob_limit_body">आपके पौधे में हर दिन 7 पत्तियाँ होती हैं। यह सीमा पार हुई तो पत्तियाँ गिरने लगेंगी।</string>
+    <string name="ob_everywhere_title">हर जगह\nठहराव</string>
+    <string name="ob_everywhere_body">नोटिफ़िकेशन या हाल के ऐप्स से खोलने पर ठहराव छूट जाता है। उन्हें भी पकड़ने के लिए Accessibility में “Unloop: हर जगह ठहराव” चालू करें।</string>
+    <string name="ob_sees">Unloop देखता है कि कौन-सा ऐप खुला है।</string>
+    <string name="ob_never">यह कभी आपकी स्क्रीन, मैसेज या आप क्या लिखते हैं, नहीं पढ़ता।</string>
+    <string name="ob_turn_on">चालू करें</string>
+    <string name="ob_done_title">सब तैयार है।</string>
+    <string name="ob_done_body">"आज" के लिए होम पर बाएँ स्वाइप करें, सेटिंग्स के लिए घड़ी को दबाकर रखें। अपने पौधे का ध्यान रखिए।</string>
+    <string name="ob_go">Unloop शुरू करें</string>
+    <string name="ob_next">आगे</string>
+    <string name="ob_later">अभी नहीं</string>
+    <string name="ob_done_check">हो गया</string>
+    <string name="ob_selected">%2$d में से %1$d</string>
+    <string name="setup_guide">सेटअप गाइड</string>
+    <string name="setup_guide_hint">पहली बार वाला सेटअप फिर से देखें</string>
 </resources>
