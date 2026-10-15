@@ -1,5 +1,9 @@
 package com.unloop.launcher
 
+import kotlinx.coroutines.delay
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.background
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -148,6 +152,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun UnloopApp() {
         val state by vm.state.collectAsStateWithLifecycle()
+        // Set when setup finishes: home starts under a lime cover that fades while it builds up.
+        var playIntro by remember { mutableStateOf(false) }
         when (state.onboarded) {
             // Preferences not read yet: plain background rather than a flash of the wrong screen.
             null -> {
@@ -165,7 +171,10 @@ class MainActivity : ComponentActivity() {
                             togglePaused = vm::togglePaused,
                             setLimit = vm::setDailyLimit,
                             openAccessibility = { openSettings(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
-                            finish = vm::finishOnboarding,
+                            finish = {
+                                playIntro = true
+                                vm.finishOnboarding()
+                            },
                         )
                     },
                 )
@@ -258,6 +267,7 @@ class MainActivity : ComponentActivity() {
                     onOpenNote = { screen = Screen.Note(it) },
                     startPage = homePage,
                     onPageChange = { homePage = it },
+                    intro = playIntro,
                     onLock = {
                         if (UnloopAccessibilityService.instance?.lockScreen() != true) {
                             toast(getString(R.string.lock_needs_accessibility))
@@ -468,6 +478,19 @@ class MainActivity : ComponentActivity() {
                 )
                 Spacer(Modifier.height(24.dp))
                 PopButton(stringResource(R.string.plant_ok), onClick = { plantSheet = false }, modifier = Modifier.fillMaxWidth())
+            }
+        }
+
+        if (playIntro) {
+            val cover = remember { Animatable(1f) }
+            LaunchedEffect(Unit) {
+                cover.animateTo(0f, tween(520, easing = FastOutSlowInEasing))
+                // Let the last home items finish rising before dropping the intro.
+                delay(1400)
+                playIntro = false
+            }
+            if (cover.value > 0f) {
+                Box(Modifier.fillMaxSize().graphicsLayer { alpha = cover.value }.background(UnloopColors.Lime))
             }
         }
     }

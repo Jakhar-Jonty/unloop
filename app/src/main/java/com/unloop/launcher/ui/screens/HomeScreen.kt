@@ -1,5 +1,7 @@
 package com.unloop.launcher.ui.screens
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Animatable
 import androidx.compose.ui.graphics.Brush
 import kotlinx.coroutines.delay
 import com.unloop.launcher.data.Task
@@ -138,6 +140,8 @@ fun HomeScreen(
     /** Page to open on (1 = Today), so returning from a note lands back on Today. */
     startPage: Int = 0,
     onPageChange: (Int) -> Unit = {},
+    /** Play the build-up entrance (right after first-run setup). */
+    intro: Boolean = false,
 ) {
     // Home is the bottom of the stack: back does nothing (no "leave app" slide).
     BackHandler {}
@@ -171,6 +175,7 @@ fun HomeScreen(
                     onPlant = onPlant,
                     onShowToday = { scope.launch { pager.animateScrollToPage(1) } },
                     onGrantUsage = onGrantUsage,
+                    intro = intro,
                 )
             } else {
                 TodayPage(
@@ -218,6 +223,7 @@ private fun MainPage(
     onPlant: () -> Unit,
     onShowToday: () -> Unit,
     onGrantUsage: () -> Unit,
+    intro: Boolean = false,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -256,13 +262,14 @@ private fun MainPage(
         val date = SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(Date(now)).uppercase()
         Text(
             date,
+            modifier = Modifier.introItem(0, intro),
             color = UnloopColors.TextSoft,
             fontFamily = Mono,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
             letterSpacing = tracking(date, 3.sp),
         )
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.introItem(1, intro)) {
             // Long-press the clock for settings.
             Text(
                 timeFormat.format(Date(now)),
@@ -295,7 +302,7 @@ private fun MainPage(
                 )
             }
         }
-        TimeStrip(state, onClick = onShowToday, onGrant = onGrantUsage)
+        Box(Modifier.introItem(2, intro)) { TimeStrip(state, onClick = onShowToday, onGrant = onGrantUsage) }
         state.nextEvent?.let { NextEventLine(it, timeFormat) }
         if (!state.isDefaultLauncher) {
             Label(
@@ -350,7 +357,7 @@ private fun MainPage(
             }
 
             @Composable
-            fun AppName(app: AppInfo, modifier: Modifier = Modifier) {
+            fun AppName(app: AppInfo, modifier: Modifier = Modifier, order: Int = 0) {
                 Text(
                     app.label,
                     fontFamily = Display,
@@ -360,6 +367,7 @@ private fun MainPage(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = modifier
+                        .introItem(3 + order, intro)
                         .combinedClickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -379,11 +387,11 @@ private fun MainPage(
                     .then(if (layout.scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier),
             ) {
                 if (layout.columns == 1) {
-                    homeApps.forEach { AppName(it) }
+                    homeApps.forEachIndexed { i, app -> AppName(app, order = i) }
                 } else {
                     homeApps.chunked(2).forEach { pair ->
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            pair.forEach { AppName(it, Modifier.weight(1f)) }
+                            pair.forEach { AppName(it, Modifier.weight(1f), order = homeApps.indexOf(it)) }
                             if (pair.size == 1) Spacer(Modifier.weight(1f))
                         }
                     }
@@ -399,7 +407,7 @@ private fun MainPage(
                 }
                 if (layout.showQuote) {
                     Spacer(Modifier.weight(1f))
-                    Quote(state.quoteIndex)
+                    Box(Modifier.introItem(10, intro)) { Quote(state.quoteIndex) }
                 }
             }
         }
@@ -408,7 +416,7 @@ private fun MainPage(
         if (focusing) {
             GhostButton(stringResource(R.string.end_focus), onClick = onEndFocus)
         } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.introItem(11, intro)) {
                 PopButton(
                     stringResource(R.string.all_apps),
                     onClick = onAllApps,
@@ -948,6 +956,24 @@ private fun PageDots(current: Int, modifier: Modifier = Modifier) {
                     .background(if (i == current) UnloopColors.Lime else UnloopColors.Faint),
             )
         }
+    }
+}
+
+/**
+ * Entrance for the home build-up: fades in and rises into place, [order] steps after the start.
+ * Does nothing when [play] is false.
+ */
+@Composable
+private fun Modifier.introItem(order: Int, play: Boolean): Modifier {
+    if (!play) return this
+    val progress = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        delay(260L + order * 70L)
+        progress.animateTo(1f, tween(460, easing = FastOutSlowInEasing))
+    }
+    return graphicsLayer {
+        alpha = progress.value
+        translationY = (1f - progress.value) * 56.dp.toPx()
     }
 }
 

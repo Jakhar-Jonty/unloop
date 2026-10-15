@@ -100,6 +100,17 @@ fun OnboardingScreen(state: UiState, actions: OnboardingActions) {
     val next = { go(index + 1) }
     BackHandler(enabled = index > 0) { go(index - 1) }
 
+    // Finale: a lime circle bursts out from the Start button and fills the screen, then home takes over.
+    val burst = remember { Animatable(0f) }
+    var leaving by rememberSaveable { mutableIntStateOf(0) }
+    LaunchedEffect(leaving) {
+        if (leaving == 1) {
+            burst.animateTo(1f, tween(480, easing = FastOutSlowInEasing))
+            actions.finish()
+        }
+    }
+
+    Box(Modifier.fillMaxSize()) {
     Column(
         Modifier
             .fillMaxSize()
@@ -172,8 +183,16 @@ fun OnboardingScreen(state: UiState, actions: OnboardingActions) {
                             Promise(stringResource(R.string.ob_never), good = false)
                         },
                     )
-                    Step.Done -> DoneStep(actions.finish)
+                    Step.Done -> DoneStep { leaving = 1 }
                 }
+            }
+        }
+    }
+        if (burst.value > 0f) {
+            Canvas(Modifier.fillMaxSize()) {
+                val origin = Offset(size.width / 2, size.height - 90.dp.toPx())
+                val reach = kotlin.math.hypot(size.width, size.height)
+                drawCircle(UnloopColors.Lime, radius = reach * burst.value, center = origin)
             }
         }
     }
