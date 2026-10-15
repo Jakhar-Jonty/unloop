@@ -340,4 +340,14 @@
     <string name="show_tasks_hint">"आज" पेज पर आपके बाकी काम (होम पर बाएँ स्वाइप करें)। पूरी सूची और नोट्स के लिए कार्ड दबाएं।</string>
     <string name="just_now">अभी-अभी</string>
     <string name="today">आज</string>
+    <string name="see_all">सभी देखें</string>
+    <string name="new_short">+ नया</string>
+    <string name="more_tasks">+%d और</string>
+    <string name="plant">पौधा</string>
+    <string name="of_short">%s में से</string>
+    <string name="over_short">%s से ज़्यादा</string>
+    <plurals name="days_short">
+        <item quantity="one">%d दिन सुरक्षित</item>
+        <item quantity="other">%d दिन सुरक्षित</item>
+    </plurals>
 </resources>

@@ -80,10 +80,10 @@ class TaskActions(
 
 /** Full to-do list and notes, opened from the home card or by swiping left on home. */
 @Composable
-fun TasksScreen(state: UiState, actions: TaskActions, onBack: () -> Unit) {
-    var notesTab by rememberSaveable { mutableStateOf(false) }
+fun TasksScreen(state: UiState, actions: TaskActions, onBack: () -> Unit, initialNotes: Boolean = false, initialNoteId: Long = 0L) {
+    var notesTab by rememberSaveable { mutableStateOf(initialNotes) }
     var editingTask by remember { mutableStateOf<Task?>(null) }
-    var editingNote by rememberSaveable { mutableLongStateOf(0L) }
+    var editingNote by rememberSaveable { mutableLongStateOf(initialNoteId) }
 
     if (editingNote != 0L) {
         val note = state.notes.firstOrNull { it.id == editingNote }
@@ -311,30 +311,6 @@ private fun TaskSheet(task: Task, onDismiss: () -> Unit, onSave: (String, String
         PopButton(stringResource(R.string.save), onClick = { onSave(title, note) }, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(12.dp))
         GhostButton(stringResource(R.string.delete), onClick = onDelete)
-    }
-}
-
-/** Quick "add a task" sheet used from the home screen card. */
-@Composable
-fun AddTaskSheet(onDismiss: () -> Unit, onAdd: (String) -> Unit) {
-    var draft by rememberSaveable { mutableStateOf("") }
-    val focus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { focus.requestFocus() }
-    UnloopSheet(onDismiss) {
-        Text(stringResource(R.string.add_task_hint), fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 28.sp)
-        Spacer(Modifier.height(14.dp))
-        UnloopTextField(
-            value = draft,
-            onValueChange = { draft = it },
-            hint = stringResource(R.string.add_task_hint),
-            onDone = {
-                onAdd(draft)
-                draft = ""
-            },
-            modifier = Modifier.focusRequester(focus),
-        )
-        Spacer(Modifier.height(16.dp))
-        PopButton(stringResource(R.string.add_short), onClick = { onAdd(draft); draft = "" }, modifier = Modifier.fillMaxWidth())
     }
 }
 

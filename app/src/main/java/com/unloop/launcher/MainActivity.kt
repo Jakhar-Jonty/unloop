@@ -68,7 +68,6 @@ import com.unloop.launcher.ui.screens.HomeScreen
 import com.unloop.launcher.ui.screens.PauseScreen
 import com.unloop.launcher.ui.screens.ReflectionScreen
 import com.unloop.launcher.ui.screens.SettingsScreen
-import com.unloop.launcher.ui.screens.AddTaskSheet
 import com.unloop.launcher.ui.screens.TaskActions
 import com.unloop.launcher.ui.screens.TasksScreen
 import com.unloop.launcher.ui.screens.StartFocusSheet
@@ -87,7 +86,7 @@ private sealed interface Screen {
     data object AllApps : Screen
     data object Settings : Screen
     data object Reflection : Screen
-    data object Tasks : Screen
+    data class Tasks(val notes: Boolean = false, val noteId: Long = 0L) : Screen
     data class Pause(val app: AppInfo, val gate: Gate) : Screen
 }
 
@@ -144,7 +143,6 @@ class MainActivity : ComponentActivity() {
         var focusSheet by remember { mutableStateOf<FocusSheet?>(null) }
         var plantSheet by remember { mutableStateOf(false) }
         var limitApp by remember { mutableStateOf<AppInfo?>(null) }
-        var addingTask by remember { mutableStateOf(false) }
         val taskActions = remember {
             TaskActions(
                 add = vm::addTask,
@@ -166,7 +164,6 @@ class MainActivity : ComponentActivity() {
             focusSheet = null
             plantSheet = false
             limitApp = null
-            addingTask = false
         }
 
         LaunchedEffect(Unit) {
@@ -208,9 +205,10 @@ class MainActivity : ComponentActivity() {
                     },
                     onPlant = { plantSheet = true },
                     onNotifications = ::expandNotifications,
-                    onOpenTasks = { screen = Screen.Tasks },
+                    onOpenTasks = { notes, noteId -> screen = Screen.Tasks(notes, noteId) },
                     onToggleTask = vm::toggleTask,
-                    onAddTask = { addingTask = true },
+                    onAddTask = vm::addTask,
+                    onNewNote = { screen = Screen.Tasks(notes = true, noteId = vm.newNote()) },
                     onLock = {
                         if (UnloopAccessibilityService.instance?.lockScreen() != true) {
                             toast(getString(R.string.lock_needs_accessibility))
@@ -228,7 +226,13 @@ class MainActivity : ComponentActivity() {
                     onBack = { screen = Screen.Home },
                     onSettings = { screen = Screen.Settings },
                 )
-                Screen.Tasks -> TasksScreen(state = state, actions = taskActions, onBack = { screen = Screen.Home })
+                is Screen.Tasks -> TasksScreen(
+                    state = state,
+                    actions = taskActions,
+                    onBack = { screen = Screen.Home },
+                    initialNotes = current.notes,
+                    initialNoteId = current.noteId,
+                )
                 Screen.Reflection -> ReflectionScreen(
                     state = state,
                     onBack = { screen = Screen.Home },
@@ -353,16 +357,6 @@ class MainActivity : ComponentActivity() {
                 },
             )
             null -> Unit
-        }
-
-        if (addingTask) {
-            AddTaskSheet(
-                onDismiss = { addingTask = false },
-                onAdd = { title ->
-                    vm.addTask(title)
-                    addingTask = false
-                },
-            )
         }
 
         limitApp?.let { app ->

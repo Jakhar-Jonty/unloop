@@ -342,4 +342,14 @@
     <string name="show_tasks_hint">Your open tasks on the Today page (swipe left on home). Tap the card for the full list and notes.</string>
     <string name="just_now">Just now</string>
     <string name="today">Today</string>
+    <string name="see_all">See all</string>
+    <string name="new_short">+ New</string>
+    <string name="more_tasks">+%d more</string>
+    <string name="plant">Plant</string>
+    <string name="of_short">of %s</string>
+    <string name="over_short">over %s</string>
+    <plurals name="days_short">
+        <item quantity="one">%d day safe</item>
+        <item quantity="other">%d days safe</item>
+    </plurals>
 </resources>

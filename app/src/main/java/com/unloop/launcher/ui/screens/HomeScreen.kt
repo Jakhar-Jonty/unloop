@@ -1,5 +1,13 @@
 package com.unloop.launcher.ui.screens
 
+import com.unloop.launcher.data.Note
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import com.unloop.launcher.ui.components.nextLeafInMs
 import com.unloop.launcher.ui.components.MAX_LEAVES
 import kotlinx.coroutines.launch
@@ -104,9 +112,10 @@ fun HomeScreen(
     onPlant: () -> Unit,
     onNotifications: () -> Unit,
     onLock: () -> Unit,
-    onOpenTasks: () -> Unit,
+    onOpenTasks: (notes: Boolean, noteId: Long) -> Unit,
     onToggleTask: (Long) -> Unit,
-    onAddTask: () -> Unit,
+    onAddTask: (String) -> Unit,
+    onNewNote: () -> Unit,
     onGrantUsage: () -> Unit,
     onSetDefault: () -> Unit,
     onMinuteTick: () -> Unit,
@@ -152,6 +161,7 @@ fun HomeScreen(
                     onOpenTasks = onOpenTasks,
                     onToggleTask = onToggleTask,
                     onAddTask = onAddTask,
+                    onNewNote = onNewNote,
                     onGrantUsage = onGrantUsage,
                 )
             }
@@ -393,40 +403,108 @@ private fun MainPage(
     }
 }
 
-/** Page 2: today at a glance. Screen time, to-do and the streak plant. */
+/** Page 2: today at a glance. Two small stat tiles, then to-do and notes. */
 @Composable
 private fun TodayPage(
     state: UiState,
     onWeek: () -> Unit,
     onPlant: () -> Unit,
-    onOpenTasks: () -> Unit,
+    onOpenTasks: (notes: Boolean, noteId: Long) -> Unit,
     onToggleTask: (Long) -> Unit,
-    onAddTask: () -> Unit,
+    onAddTask: (String) -> Unit,
+    onNewNote: () -> Unit,
     onGrantUsage: () -> Unit,
 ) {
-    var showTop by rememberSaveable { mutableStateOf(false) }
     Column(
         Modifier
             .fillMaxSize()
             .systemBarsPadding()
+            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 28.dp),
     ) {
         Spacer(Modifier.height(36.dp))
         val title = stringResource(R.string.today)
         Text(title, fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 44.sp, letterSpacing = tracking(title, (-1.5).sp))
-        Spacer(Modifier.height(24.dp))
-        ScreenTimeCard(state = state, expanded = showTop, onToggle = { showTop = !showTop }, onGrant = onGrantUsage, onWeek = onWeek)
-        if (state.showTasks) {
-            Spacer(Modifier.height(18.dp))
-            TasksCard(state, onOpen = onOpenTasks, onToggle = onToggleTask, onAdd = onAddTask)
-        }
-        if (state.usage != null) {
-            Spacer(Modifier.height(18.dp))
-            PlantCard(state, onClick = onPlant)
+        Text(
+            SimpleDateFormat("EEEE, d MMMM", Locale.getDefault()).format(Date()),
+            color = UnloopColors.TextSoft,
+            fontFamily = Display,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+        )
+        Spacer(Modifier.height(22.dp))
+
+        val usage = state.usage
+        if (state.hasUsageAccess && usage != null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.height(IntrinsicSize.Max)) {
+                val limitMs = state.limitMinutes * 60_000L
+                val over = usage.totalMs >= limitMs
+                StatTile(edge = if (over) UnloopColors.Orange else UnloopColors.LimeEdge, onClick = onWeek, modifier = Modifier.weight(1f)) {
+                    Label(stringResource(R.string.cat_screen_time), size = 10.sp)
+                    Spacer(Modifier.height(6.dp))
+                    Text(duration(usage.totalMs), fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp, maxLines = 1)
+                    Text(
+                        stringResource(if (over) R.string.over_short else R.string.of_short, limit(state.limitMinutes)),
+                        color = UnloopColors.TextSoft,
+                        fontFamily = Display,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.height(10.dp))
+                    Box(Modifier.fillMaxWidth().height(4.dp).clip(CircleShape).background(UnloopColors.Border)) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth((usage.totalMs.toFloat() / limitMs).coerceIn(0.02f, 1f))
+                                .height(4.dp)
+                                .clip(CircleShape)
+                                .background(if (over) UnloopColors.Orange else UnloopColors.Lime),
+                        )
+                    }
+                }
+                val leaves = state.leaves
+                StatTile(edge = if (leaves == MAX_LEAVES) UnloopColors.LimeEdge else UnloopColors.Orange, onClick = onPlant, modifier = Modifier.weight(1f)) {
+                    Row {
+                        Column(Modifier.weight(1f)) {
+                            Label(stringResource(R.string.plant), size = 10.sp)
+                            Spacer(Modifier.height(6.dp))
+                            Text(
+                                "$leaves/$MAX_LEAVES",
+                                color = if (leaves == MAX_LEAVES) UnloopColors.Text else UnloopColors.Orange,
+                                fontFamily = Display,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 26.sp,
+                            )
+                            val streak = state.streak ?: 0
+                            Text(
+                                pluralStringResource(R.plurals.days_short, streak, streak),
+                                color = UnloopColors.TextSoft,
+                                fontFamily = Display,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        Plant(leaves = leaves, flowering = state.flowering, modifier = Modifier.size(width = 34.dp, height = 48.dp))
+                    }
+                }
+            }
+        } else {
+            Label(
+                stringResource(R.string.allow_usage_access) + "  →",
+                color = UnloopColors.Orange,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable(onClick = onGrantUsage)
+                    .padding(vertical = 8.dp),
+            )
         }
         if (state.showReflectionNudge && state.hasUsageAccess) {
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(12.dp))
             Label(
                 stringResource(R.string.week_ready),
                 color = UnloopColors.Lime,
@@ -436,7 +514,147 @@ private fun TodayPage(
                     .padding(vertical = 6.dp),
             )
         }
-        Spacer(Modifier.height(48.dp))
+
+        if (state.showTasks) {
+            Spacer(Modifier.height(32.dp))
+            val open = state.openTasks
+            SectionHeader(
+                title = stringResource(R.string.todo),
+                count = if (open.isEmpty()) null else pluralStringResource(R.plurals.tasks_left, open.size, open.size),
+                action = stringResource(R.string.see_all),
+                onAction = { onOpenTasks(false, 0L) },
+            )
+            Spacer(Modifier.height(12.dp))
+            var draft by rememberSaveable { mutableStateOf("") }
+            UnloopTextField(
+                value = draft,
+                onValueChange = { draft = it },
+                hint = stringResource(R.string.add_task_hint),
+                onDone = {
+                    onAddTask(draft)
+                    draft = ""
+                },
+            )
+            Spacer(Modifier.height(6.dp))
+            if (open.isEmpty()) {
+                Text(stringResource(R.string.nothing_to_do), color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, modifier = Modifier.padding(vertical = 12.dp))
+            }
+            open.take(5).forEach { task ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onOpenTasks(false, 0L) }
+                        .padding(vertical = 11.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TaskCheck(done = false, onClick = { onToggleTask(task.id) }, size = 24)
+                    Spacer(Modifier.width(14.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(task.title, fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        if (task.note.isNotBlank()) {
+                            Text(task.note, color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
+                }
+            }
+            if (open.size > 5) {
+                Label(
+                    stringResource(R.string.more_tasks, open.size - 5),
+                    color = UnloopColors.Lime,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { onOpenTasks(false, 0L) }
+                        .padding(vertical = 8.dp),
+                )
+            }
+
+            Spacer(Modifier.height(32.dp))
+            SectionHeader(
+                title = stringResource(R.string.notes_tab),
+                count = if (state.notes.isEmpty()) null else state.notes.size.toString(),
+                action = stringResource(R.string.new_short),
+                onAction = onNewNote,
+            )
+            Spacer(Modifier.height(12.dp))
+            val notes = state.notes.filter { it.text.isNotBlank() }.sortedByDescending { it.updatedAt }
+            if (notes.isEmpty()) {
+                Text(stringResource(R.string.no_notes), color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            }
+            notes.take(4).chunked(2).forEach { pair ->
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(bottom = 12.dp)) {
+                    pair.forEach { note -> NoteTile(note, Modifier.weight(1f)) { onOpenTasks(true, note.id) } }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+            if (notes.size > 4) {
+                Label(
+                    stringResource(R.string.see_all),
+                    color = UnloopColors.Lime,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { onOpenTasks(true, 0L) }
+                        .padding(vertical = 8.dp),
+                )
+            }
+        }
+        Spacer(Modifier.height(56.dp))
+    }
+}
+
+@Composable
+private fun StatTile(edge: Color, onClick: () -> Unit, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    PopCard(
+        edge = edge,
+        fillHeight = true,
+        modifier = modifier
+            .fillMaxHeight()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            ),
+        content = content,
+    )
+}
+
+@Composable
+private fun SectionHeader(title: String, count: String?, action: String, onAction: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Label(title, color = UnloopColors.Text, size = 12.sp)
+        if (count != null) {
+            Spacer(Modifier.width(10.dp))
+            Label(count, color = UnloopColors.Muted, size = 11.sp)
+        }
+        Spacer(Modifier.weight(1f))
+        Label(
+            action,
+            color = UnloopColors.Lime,
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable(onClick = onAction)
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+        )
+    }
+}
+
+@Composable
+private fun NoteTile(note: Note, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val lines = note.text.trim().lines()
+    Column(
+        modifier
+            .heightIn(min = 116.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(UnloopColors.Surface)
+            .border(1.dp, UnloopColors.Border, RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+    ) {
+        Text(lines.first(), fontFamily = Display, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        val rest = lines.drop(1).joinToString(" ").trim()
+        if (rest.isNotEmpty()) {
+            Spacer(Modifier.height(4.dp))
+            Text(rest, color = UnloopColors.Muted, fontFamily = Display, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, lineHeight = 18.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+        }
     }
 }
 
@@ -804,7 +1022,6 @@ fun scheduleName(id: String): String? = when (id) {
     else -> null
 }
 
-/** Next three open tasks with checks. Tapping the card opens the full list. */
 @Composable
 private fun TasksCard(state: UiState, onOpen: () -> Unit, onToggle: (Long) -> Unit, onAdd: () -> Unit) {
     val open = state.openTasks

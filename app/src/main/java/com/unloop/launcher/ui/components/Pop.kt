@@ -13,6 +13,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -121,6 +122,8 @@ fun GhostButton(
 fun PopCard(
     modifier: Modifier = Modifier,
     edge: Color = UnloopColors.SurfaceEdge,
+    /** Stretch the face to the card's full height, e.g. when cards sit side by side in a row. */
+    fillHeight: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val shape = RoundedCornerShape(24.dp)
@@ -134,6 +137,7 @@ fun PopCard(
         Column(
             Modifier
                 .fillMaxWidth()
+                .then(if (fillHeight) Modifier.fillMaxHeight() else Modifier)
                 .padding(bottom = Depth)
                 .clip(shape)
                 .background(UnloopColors.Surface)
