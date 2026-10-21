@@ -54,7 +54,7 @@ Unloop uses Android's Accessibility API only for its "Pause everywhere" feature:
 
 **Category:** Personalization  ·  **Tags:** Launcher, Productivity, Digital wellbeing
 **Contact email:** jontysingh055@gmail.com
-**Privacy policy URL:** host `docs/privacy.html` (see README in this folder) and paste the public URL.
+**Privacy policy URL:** `https://jakhar-jonty.github.io/unloop/privacy.html`
 
 ## Graphics (in this folder)
 

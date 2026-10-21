@@ -14,12 +14,11 @@ a lost upload key can be reset through Play support, but it takes days.
 
 ## 1. Host the privacy policy
 
-Play needs a public URL. The policy is `docs/privacy.html`. The GitHub repo is private,
-so pick one:
+The repo is public, so GitHub Pages hosts it for free. One-time setup on github.com:
+repo **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main`, folder `/docs` → Save**.
 
-- **Google Sites** (free, 5 minutes): new site → paste the text of `privacy.html` → Publish → copy the URL.
-- **A separate public GitHub repo** with only `privacy.html` (renamed `index.html`) and GitHub Pages turned on.
-- **Netlify Drop**: drag the `docs` folder onto app.netlify.com/drop.
+After a minute the policy is live at:
+`https://jakhar-jonty.github.io/unloop/privacy.html`
 
 ## 2. Create the app in Play Console
 
