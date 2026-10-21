@@ -7,3 +7,6 @@ local.properties
 .DS_Store
 captures/
 .vscode/
+keystore.properties
+*.jks
+*.keystore

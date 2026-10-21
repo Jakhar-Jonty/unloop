@@ -23,7 +23,6 @@ import com.unloop.launcher.ui.screens.DailyLimitSheet
 import com.unloop.launcher.service.UnloopAccessibilityService
 import com.unloop.launcher.data.Gate
 import androidx.compose.runtime.rememberCoroutineScope
-import android.annotation.SuppressLint
 import android.Manifest
 import android.app.LocaleManager
 import android.app.role.RoleManager
@@ -81,6 +80,7 @@ import com.unloop.launcher.ui.screens.PauseScreen
 import com.unloop.launcher.ui.screens.ReflectionScreen
 import com.unloop.launcher.ui.screens.SettingsScreen
 import com.unloop.launcher.ui.screens.TaskActions
+import com.unloop.launcher.ui.screens.AccessibilityConsentSheet
 import com.unloop.launcher.ui.screens.NoteEditor
 import com.unloop.launcher.ui.screens.OnboardingActions
 import com.unloop.launcher.ui.screens.OnboardingScreen
@@ -186,6 +186,8 @@ class MainActivity : ComponentActivity() {
         var sheetApp by remember { mutableStateOf<AppInfo?>(null) }
         var focusSheet by remember { mutableStateOf<FocusSheet?>(null) }
         var plantSheet by remember { mutableStateOf(false) }
+        // Google Play requires an explicit, in-app consent before every trip to Accessibility settings.
+        var a11yConsent by remember { mutableStateOf(false) }
         // Which home page was showing, so coming back from a note lands on Today again.
         var homePage by rememberSaveable { mutableIntStateOf(0) }
         var limitApp by remember { mutableStateOf<AppInfo?>(null) }
@@ -328,7 +330,7 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     onLanguage = ::setLanguage,
-                    onPauseEverywhere = { openSettings(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
+                    onPauseEverywhere = { a11yConsent = true },
                     onPauseStep = vm::setPauseStep,
                     onRemoveLimit = { vm.setAppLimit(it, null) },
                     onUpdateSchedule = vm::updateSchedule,
@@ -443,6 +445,16 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        if (a11yConsent) {
+            AccessibilityConsentSheet(
+                onAgree = {
+                    a11yConsent = false
+                    openSettings(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                },
+                onDismiss = { a11yConsent = false },
+            )
+        }
+
         if (plantSheet) {
             val streak = state.streak ?: 0
             val leaves = state.leaves
@@ -529,12 +541,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Pulls down the notification shade. No public API; StatusBarManager has done this for years. */
-    @SuppressLint("WrongConstant")
+    /** Pulls down the notification shade through the accessibility service (the supported way). */
     private fun expandNotifications() {
-        runCatching {
-            val statusBar = getSystemService("statusbar")
-            statusBar.javaClass.getMethod("expandNotificationsPanel").invoke(statusBar)
+        if (UnloopAccessibilityService.instance?.openNotifications() != true) {
+            toast(getString(R.string.shade_needs_accessibility))
         }
     }
 

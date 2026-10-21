@@ -11,8 +11,6 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <!-- Optional "next event" line on the home screen. Asked for only when turned on. -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
-    <!-- Swipe down on home opens the notification shade. -->
-    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <!-- Optional Unloop lock-screen wallpaper. -->
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <!-- Re-arm scheduled Focus after a restart. -->

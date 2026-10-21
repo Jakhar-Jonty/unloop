@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Unloop</string>
+    <string name="app_name" translatable="false">Unloop</string>
 
     <!-- Durations -->
     <string name="duration_hm">%1$dh %2$dm</string>
@@ -96,8 +96,8 @@
     <string name="add_to_home">Add to home</string>
     <string name="remove_from_home">Remove from home</string>
     <string name="pause_5s">Pause before opening</string>
-    <string name="state_on">On</string>
-    <string name="state_off">Off</string>
+    <string name="toggle_on">On</string>
+    <string name="toggle_off">Off</string>
     <string name="allowed_in_focus">Allowed in Focus mode</string>
     <string name="state_yes">Yes</string>
     <string name="state_no">No</string>
@@ -129,10 +129,8 @@
     <string name="settings">Settings</string>
     <string name="daily_limit">Daily phone limit</string>
     <string name="focus_apps_hint">Focus mode and all schedules show only these apps on home.</string>
-    <string name="paused_hint">Tap to remove the pause.</string>
     <string name="hidden_apps">Hidden apps</string>
     <string name="hidden_hint">Hidden from All apps. Still installed.</string>
-    <string name="none">None</string>
     <string name="permissions">Permissions</string>
     <string name="usage_access">Usage access</string>
     <string name="default_home">Default home app</string>
@@ -146,7 +144,6 @@
     <string name="strict_confirm_body">Until %s you won\'t be able to remove pauses, unhide apps, raise your limit or end Focus mode early. This can\'t be undone.</string>
     <string name="strict_confirm">Lock settings</string>
     <string name="cancel">Cancel</string>
-    <string name="home_widgets">On your home screen</string>
     <string name="daily_quote">Quote on home</string>
     <string name="next_event_setting">Next calendar event</string>
     <string name="language">Language</string>
@@ -334,17 +331,12 @@
     <string name="clear_done">Clear finished</string>
     <string name="task_note_hint">Add a note…</string>
     <string name="delete">Delete</string>
-    <string name="new_note">+ New note</string>
     <string name="note_hint">Write something…</string>
     <string name="no_notes">No notes yet.</string>
-    <string name="empty_note">Empty note</string>
     <string name="show_tasks">To-do &amp; notes on Today</string>
     <string name="show_tasks_hint">To-do and notes on the Today page (swipe left on home).</string>
-    <string name="just_now">Just now</string>
     <string name="today">Today</string>
-    <string name="see_all">See all</string>
     <string name="new_short">+ New</string>
-    <string name="more_tasks">+%d more</string>
     <string name="plant">Plant</string>
     <string name="of_short">of %s</string>
     <string name="over_short">over %s</string>
@@ -374,7 +366,7 @@
     <string name="ob_everywhere_body">Opening an app from a notification or Recents skips the pause. Turn on “Unloop: pause everywhere” in Accessibility to catch those too.</string>
     <string name="ob_sees">Unloop sees which app is open.</string>
     <string name="ob_never">It never reads your screen, messages or what you type.</string>
-    <string name="ob_turn_on">Turn on</string>
+    <string name="ob_turn_on">Agree and turn on</string>
     <string name="ob_done_title">You\'re all set.</string>
     <string name="ob_done_body">Swipe left on home for Today, long-press the clock for Settings. Look after your plant.</string>
     <string name="ob_go">Take me home</string>
@@ -384,4 +376,6 @@
     <string name="ob_selected">%1$d of %2$d</string>
     <string name="setup_guide">Setup guide</string>
     <string name="setup_guide_hint">Walk through the first-run setup again</string>
+    <string name="a11y_no_share">Nothing it sees is stored, sent or shared. Unloop has no internet access.</string>
+    <string name="shade_needs_accessibility">Turn on Pause everywhere in Settings to open notifications with a swipe.</string>
 </resources>

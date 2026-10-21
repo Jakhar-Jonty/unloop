@@ -94,8 +94,8 @@
     <string name="add_to_home">होम पर जोड़ें</string>
     <string name="remove_from_home">होम से हटाएं</string>
     <string name="pause_5s">खोलने से पहले ठहराव</string>
-    <string name="state_on">चालू</string>
-    <string name="state_off">बंद</string>
+    <string name="toggle_on">चालू</string>
+    <string name="toggle_off">बंद</string>
     <string name="allowed_in_focus">फ़ोकस मोड में चलेगा</string>
     <string name="state_yes">हाँ</string>
     <string name="state_no">नहीं</string>
@@ -127,10 +127,8 @@
     <string name="settings">सेटिंग्स</string>
     <string name="daily_limit">फ़ोन की रोज़ की सीमा</string>
     <string name="focus_apps_hint">फ़ोकस मोड और सभी समय-सारणी में होम पर सिर्फ़ ये ऐप्स दिखेंगे।</string>
-    <string name="paused_hint">ठहराव हटाने के लिए दबाएं।</string>
     <string name="hidden_apps">छिपे हुए ऐप्स</string>
     <string name="hidden_hint">सभी ऐप्स में नहीं दिखेंगे। इंस्टॉल रहेंगे।</string>
-    <string name="none">कोई नहीं</string>
     <string name="permissions">अनुमतियाँ</string>
     <string name="usage_access">यूसेज एक्सेस</string>
     <string name="default_home">डिफ़ॉल्ट होम ऐप</string>
@@ -144,7 +142,6 @@
     <string name="strict_confirm_body">%s तक आप ठहराव नहीं हटा पाएंगे, ऐप्स नहीं दिखा पाएंगे, सीमा नहीं बढ़ा पाएंगे और फ़ोकस मोड बीच में खत्म नहीं कर पाएंगे। इसे वापस नहीं लिया जा सकता।</string>
     <string name="strict_confirm">सेटिंग्स लॉक करें</string>
     <string name="cancel">रद्द करें</string>
-    <string name="home_widgets">आपकी होम स्क्रीन पर</string>
     <string name="daily_quote">होम पर विचार</string>
     <string name="next_event_setting">कैलेंडर का अगला इवेंट</string>
     <string name="language">भाषा</string>
@@ -332,17 +329,12 @@
     <string name="clear_done">पूरे हुए हटाएं</string>
     <string name="task_note_hint">नोट जोड़ें…</string>
     <string name="delete">हटाएं</string>
-    <string name="new_note">+ नया नोट</string>
     <string name="note_hint">कुछ लिखें…</string>
     <string name="no_notes">अभी कोई नोट नहीं।</string>
-    <string name="empty_note">खाली नोट</string>
     <string name="show_tasks">"आज" पर करने के काम और नोट्स</string>
     <string name="show_tasks_hint">"आज" पेज पर करने के काम और नोट्स (होम पर बाएँ स्वाइप करें)।</string>
-    <string name="just_now">अभी-अभी</string>
     <string name="today">आज</string>
-    <string name="see_all">सभी देखें</string>
     <string name="new_short">+ नया</string>
-    <string name="more_tasks">+%d और</string>
     <string name="plant">पौधा</string>
     <string name="of_short">%s में से</string>
     <string name="over_short">%s से ज़्यादा</string>
@@ -372,7 +364,7 @@
     <string name="ob_everywhere_body">नोटिफ़िकेशन या हाल के ऐप्स से खोलने पर ठहराव छूट जाता है। उन्हें भी पकड़ने के लिए Accessibility में “Unloop: हर जगह ठहराव” चालू करें।</string>
     <string name="ob_sees">Unloop देखता है कि कौन-सा ऐप खुला है।</string>
     <string name="ob_never">यह कभी आपकी स्क्रीन, मैसेज या आप क्या लिखते हैं, नहीं पढ़ता।</string>
-    <string name="ob_turn_on">चालू करें</string>
+    <string name="ob_turn_on">सहमत हूँ, चालू करें</string>
     <string name="ob_done_title">सब तैयार है।</string>
     <string name="ob_done_body">"आज" के लिए होम पर बाएँ स्वाइप करें, सेटिंग्स के लिए घड़ी को दबाकर रखें। अपने पौधे का ध्यान रखिए।</string>
     <string name="ob_go">मुझे होम ले चलिए</string>
@@ -382,4 +374,6 @@
     <string name="ob_selected">%2$d में से %1$d</string>
     <string name="setup_guide">सेटअप गाइड</string>
     <string name="setup_guide_hint">पहली बार वाला सेटअप फिर से देखें</string>
+    <string name="a11y_no_share">जो यह देखता है, वह न सेव होता है, न भेजा जाता है, न साझा होता है। Unloop के पास इंटरनेट की पहुँच ही नहीं है।</string>
+    <string name="shade_needs_accessibility">स्वाइप से नोटिफ़िकेशन खोलने के लिए सेटिंग्स में “हर जगह ठहराव” चालू करें।</string>
 </resources>

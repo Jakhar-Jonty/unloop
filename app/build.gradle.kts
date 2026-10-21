@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -14,8 +15,22 @@ android {
         applicationId = "com.unloop.launcher"
         minSdk = 29
         targetSdk = 36
-        versionCode = 14
-        versionName = "0.4.0"
+        versionCode = 15
+        versionName = "1.0.0"
+    }
+
+    // Upload key for Play. Lives outside the repo; keystore.properties (git-ignored) points to it.
+    val keystoreFile = rootProject.file("keystore.properties")
+    signingConfigs {
+        if (keystoreFile.exists()) {
+            val props = Properties().apply { keystoreFile.inputStream().use { load(it) } }
+            create("upload") {
+                storeFile = file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
@@ -23,8 +38,8 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Sideloading for now; swap for a real upload key before the Play Store.
-            signingConfig = signingConfigs.getByName("debug")
+            // Signed with the upload key when present; otherwise unsigned (CI, other machines).
+            signingConfig = signingConfigs.findByName("upload")
         }
     }
 

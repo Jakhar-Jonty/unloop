@@ -181,6 +181,7 @@ fun OnboardingScreen(state: UiState, actions: OnboardingActions) {
                             Spacer(Modifier.height(16.dp))
                             Promise(stringResource(R.string.ob_sees), good = true)
                             Promise(stringResource(R.string.ob_never), good = false)
+                            Promise(stringResource(R.string.a11y_no_share), good = false)
                         },
                     )
                     Step.Done -> DoneStep { leaving = 1 }
@@ -519,5 +520,26 @@ private fun DoneStep(onFinish: () -> Unit) {
         Spacer(Modifier.weight(1.2f))
         PopButton(stringResource(R.string.ob_go), onClick = onFinish, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+/**
+ * Prominent disclosure for the accessibility service, shown before every trip to Accessibility
+ * settings outside of setup (Google Play's Accessibility API policy).
+ */
+@Composable
+fun AccessibilityConsentSheet(onAgree: () -> Unit, onDismiss: () -> Unit) {
+    UnloopSheet(onDismiss) {
+        Text(stringResource(R.string.pause_everywhere), fontFamily = Display, fontWeight = FontWeight.ExtraBold, fontSize = 30.sp)
+        Spacer(Modifier.height(10.dp))
+        Body(stringResource(R.string.ob_everywhere_body))
+        Spacer(Modifier.height(14.dp))
+        Promise(stringResource(R.string.ob_sees), good = true)
+        Promise(stringResource(R.string.ob_never), good = false)
+        Promise(stringResource(R.string.a11y_no_share), good = false)
+        Spacer(Modifier.height(22.dp))
+        PopButton(stringResource(R.string.ob_turn_on), onClick = onAgree, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(12.dp))
+        GhostButton(stringResource(R.string.ob_later), onClick = onDismiss)
     }
 }

@@ -190,7 +190,7 @@ fun SettingsScreen(
                     ChipRow {
                         pauseSteps.forEach { step ->
                             Chip(
-                                if (step == 0) stringResource(R.string.state_off) else stringResource(R.string.growth_step, step),
+                                if (step == 0) stringResource(R.string.toggle_off) else stringResource(R.string.growth_step, step),
                                 selected = state.pauseStepSeconds == step,
                                 onClick = { onPauseStep(step) },
                             )
@@ -456,7 +456,7 @@ private fun Overview(state: UiState, language: String?, onOpen: (Page) -> Unit, 
 }
 
 @Composable
-private fun onOff(on: Boolean): String = stringResource(if (on) R.string.state_on else R.string.state_off).lowercase()
+private fun onOff(on: Boolean): String = stringResource(if (on) R.string.toggle_on else R.string.toggle_off).lowercase()
 
 // ---------------------------------------------------------------------------------------------
 // Pages
@@ -770,7 +770,7 @@ private fun PermissionRow(title: String, ok: Boolean, onFix: () -> Unit, optiona
             }
         }
         Label(
-            if (ok) stringResource(R.string.state_on) else stringResource(R.string.turn_on),
+            if (ok) stringResource(R.string.toggle_on) else stringResource(R.string.turn_on),
             color = when {
                 ok -> UnloopColors.Lime
                 optional -> UnloopColors.TextSoft

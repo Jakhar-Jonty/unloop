@@ -59,13 +59,13 @@ fun AppActionsSheet(
         ActionRow(if (isFavorite) stringResource(R.string.remove_from_home) else stringResource(R.string.add_to_home), onClick = onToggleFavorite)
         ActionRow(
             stringResource(R.string.pause_5s),
-            state = if (isPaused) stringResource(R.string.state_on) else stringResource(R.string.state_off),
+            state = if (isPaused) stringResource(R.string.toggle_on) else stringResource(R.string.toggle_off),
             stateColor = if (isPaused) UnloopColors.Orange else UnloopColors.Muted,
             onClick = onTogglePaused,
         )
         ActionRow(
             stringResource(R.string.daily_limit_app),
-            state = limitMinutes?.let { limit(it) } ?: stringResource(R.string.state_off),
+            state = limitMinutes?.let { limit(it) } ?: stringResource(R.string.toggle_off),
             stateColor = if (limitMinutes != null) UnloopColors.Orange else UnloopColors.Muted,
             onClick = onDailyLimit,
         )
@@ -141,7 +141,7 @@ fun DailyLimitSheet(
         FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             limitChoices.forEach { minutes ->
                 Chip(
-                    minutes?.let { limit(it) } ?: stringResource(R.string.state_off),
+                    minutes?.let { limit(it) } ?: stringResource(R.string.toggle_off),
                     selected = current == minutes,
                     onClick = { onChoose(minutes) },
                 )

@@ -97,7 +97,7 @@ object ScheduleController {
         }
         val alarm = context.getSystemService(AlarmManager::class.java)
         val intent = PendingIntent.getBroadcast(
-            context, 1, Intent(context, ScheduleReceiver::class.java),
+            context, 1, Intent(context, ScheduleReceiver::class.java).setAction(ScheduleReceiver.ACTION_SCHEDULE),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val next = nextStart(prefs.schedules, now)
@@ -109,8 +109,14 @@ object ScheduleController {
 /** Starts scheduled Focus at the window's start time, and re-arms alarms after a reboot. */
 class ScheduleReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        // Only our own alarm and the system's boot broadcast.
+        if (intent.action != ACTION_SCHEDULE && intent.action != Intent.ACTION_BOOT_COMPLETED) return
         val prefs = Prefs(context)
         FocusController.endIfExpired(context, prefs)
         ScheduleController.apply(context, prefs)
+    }
+
+    companion object {
+        const val ACTION_SCHEDULE = "com.unloop.launcher.action.SCHEDULE"
     }
 }

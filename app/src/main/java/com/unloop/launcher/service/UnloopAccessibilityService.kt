@@ -138,6 +138,8 @@ class UnloopAccessibilityService : AccessibilityService() {
 
     fun lockScreen(): Boolean = performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN)
 
+    fun openNotifications(): Boolean = performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)
+
     companion object {
         /** Set while the service is running; null when the user hasn't turned it on. */
         @Volatile
@@ -145,9 +147,10 @@ class UnloopAccessibilityService : AccessibilityService() {
             private set
 
         fun isEnabled(context: Context): Boolean {
-            val me = ComponentName(context, UnloopAccessibilityService::class.java).flattenToString()
+            val me = ComponentName(context, UnloopAccessibilityService::class.java)
             val enabled = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES).orEmpty()
-            return enabled.split(':').any { it.equals(me, ignoreCase = true) }
+            // Entries may be stored in full or short form ("pkg/.Class"); compare as components.
+            return enabled.split(':').any { ComponentName.unflattenFromString(it) == me }
         }
     }
 }
