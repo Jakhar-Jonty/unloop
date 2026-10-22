@@ -7,7 +7,7 @@ Copy these into Play Console. Character limits are noted where Google enforces t
 **App name** (30): `Unloop: Minimalist Launcher`
 
 **Short description** (80):
-`A calm, minimalist home screen that adds a mindful pause before distracting apps.`
+`A calm, minimalist home screen with a mindful pause before distracting apps.`
 
 **Full description** (4000):
 
