@@ -15,8 +15,8 @@ android {
         applicationId = "com.unloop.launcher"
         minSdk = 29
         targetSdk = 36
-        versionCode = 15
-        versionName = "1.0.0"
+        versionCode = 16
+        versionName = "1.0.1"
     }
 
     // Upload key for Play. Lives outside the repo; keystore.properties (git-ignored) points to it.
